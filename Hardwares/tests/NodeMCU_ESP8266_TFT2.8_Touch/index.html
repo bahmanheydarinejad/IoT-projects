@@ -695,10 +695,10 @@
     <h2 class="section-title"><i class="fa-solid fa-diagram-project"></i> دیاگرام و جدول تطبیق اتصالات (Wiring Pinout)</h2>
     
     <div class="alert alert-info">
-      <i class="fa-solid fa-circle-info" style="font-size: 1.3rem; margin-top: 2px;"></i>
+      <i class="fa-solid fa-ribbon" style="font-size: 1.3rem; margin-top: 2px;"></i>
       <div>
-        <strong>نحوه اشتراک‌گذاری گذرگاه SPI:</strong>
-        خطوط کلاک (<code>SCK / T_CLK</code>) و دیتای ارسالی (<code>SDI / T_DIN</code>) بین نمایشگر و کنترلر تاچ موازی می‌شوند. تفکیک تراشه‌ها توسط پایه‌های مجزای Chip Select یعنی <strong>D8</strong> برای تصویر و <strong>D2</strong> برای لمس صورت می‌گیرد.
+        <strong>چیدمان کاملاً منظم جهت اتصال با کابل‌های فلت نواری (Ribbon Cable):</strong>
+        برای جلوگیری از گره خوردن یا ضربدری شدن سیم‌ها، پایه‌های کنترلی نمایشگر به گونه‌ای بازطراحی شده‌اند که پایه‌های ۳ و ۴ و ۵ نمایشگر (<code>CS</code>، <code>RESET</code>، <code>DC</code>) دقیقاً پشت سر هم به پایه‌های <strong><code>D1</code> و <code>D2</code> و <code>D3</code></strong> روی برد NodeMCU وصل شوند. تمام پایه‌ها بر روی <strong>یک سمت برد NodeMCU</strong> متمرکز هستند.
       </div>
     </div>
 
@@ -706,22 +706,28 @@
       <table class="pinout-table">
         <thead>
           <tr>
-            <th style="width: 50px; text-align: center;">ردیف</th>
+            <th style="width: 50px; text-align: center;">پین</th>
             <th>پین ماژول نمایشگر ۲.۸ اینچ</th>
             <th>پین برد NodeMCU</th>
             <th>شماره GPIO</th>
             <th>دسته‌بندی سیگنال</th>
-            <th>شرح عملکرد اتصال</th>
+            <th>تطبیق با کابل فلت</th>
           </tr>
         </thead>
         <tbody>
+          <!-- دسته اول: تصویر -->
+          <tr style="background: rgba(56, 189, 248, 0.08);">
+            <td colspan="6" style="font-weight: 800; color: var(--accent); padding: 8px 16px;">
+              🎀 دسته اول: کابل فلت ۸ تایی تصویر (پین‌های ۱ تا ۸ نمایشگر)
+            </td>
+          </tr>
           <tr>
             <td style="text-align: center;">۱</td>
             <td><strong>VCC</strong></td>
             <td><strong>3V3</strong></td>
             <td>-</td>
             <td><span class="pin-badge pin-power">POWER (+3.3V)</span></td>
-            <td>تغذیه مدار منطقی نمایشگر و تاچ</td>
+            <td>سیم اول فلت -> پایه 3V3 برد NodeMCU</td>
           </tr>
           <tr>
             <td style="text-align: center;">۲</td>
@@ -729,31 +735,31 @@
             <td><strong>GND</strong></td>
             <td>-</td>
             <td><span class="pin-badge pin-gnd">GROUND (0V)</span></td>
-            <td>اتصال مشترک زمین مدار</td>
+            <td>سیم دوم فلت -> پایه GND چسبیده به 3V3</td>
           </tr>
           <tr>
             <td style="text-align: center;">۳</td>
             <td><strong>CS</strong></td>
-            <td><strong>D8</strong></td>
-            <td><code>GPIO15</code></td>
-            <td><span class="pin-badge pin-cs">TFT CHIP SELECT</span></td>
-            <td>فعال‌ساز تراشه تصویر (Active Low - سازگار با بوت پول‌داون ESP8266)</td>
+            <td><strong>D1</strong></td>
+            <td><code>GPIO5</code></td>
+            <td><span class="pin-badge pin-cs">TFT CS</span></td>
+            <td><strong>سیم سوم فلت -> پایه D1</strong> (انتخاب تصویر)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۴</td>
             <td><strong>RESET</strong></td>
-            <td><strong>D0</strong> (یا <strong>RST</strong>)</td>
-            <td><code>GPIO16</code></td>
+            <td><strong>D2</strong></td>
+            <td><code>GPIO4</code></td>
             <td><span class="pin-badge pin-ctrl">RESET</span></td>
-            <td>ریست سخت‌افزاری نمایشگر در شروع کار</td>
+            <td><strong>سیم چهارم فلت -> پایه D2</strong> (پشت سر هم با D1)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۵</td>
             <td><strong>DC / RS</strong></td>
-            <td><strong>D1</strong></td>
-            <td><code>GPIO5</code></td>
+            <td><strong>D3</strong></td>
+            <td><code>GPIO0</code></td>
             <td><span class="pin-badge pin-ctrl">DATA / COMMAND</span></td>
-            <td>تفکیک بایت‌های رجیستری دستور از داده‌های پیکسلی</td>
+            <td><strong>سیم پنجم فلت -> پایه D3</strong> (پشت سر هم با D2)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۶</td>
@@ -761,7 +767,7 @@
             <td><strong>D7</strong></td>
             <td><code>GPIO13</code></td>
             <td><span class="pin-badge pin-spi">HSPI MOSI</span></td>
-            <td>خط ارسال داده‌های تصویر از نودام‌سی‌یو به نمایشگر</td>
+            <td>سیم ششم فلت -> خط دیتای سخت‌افزاری D7</td>
           </tr>
           <tr>
             <td style="text-align: center;">۷</td>
@@ -769,7 +775,7 @@
             <td><strong>D5</strong></td>
             <td><code>GPIO14</code></td>
             <td><span class="pin-badge pin-spi">HSPI CLK</span></td>
-            <td>کلاک همگام‌ساز سخت‌افزاری SPI</td>
+            <td>سیم هفتم فلت -> خط کلاک سخت‌افزاری D5</td>
           </tr>
           <tr>
             <td style="text-align: center;">۸</td>
@@ -777,15 +783,13 @@
             <td><strong>3V3</strong></td>
             <td>-</td>
             <td><span class="pin-badge pin-power">BACKLIGHT</span></td>
-            <td>تغذیه بک‌لایت (نور پس‌زمینه دائم روشن با حداکثر شفافیت)</td>
+            <td>سیم هشتم فلت -> تغذیه بک‌لایت 3V3 دائم روشن</td>
           </tr>
-          <tr>
-            <td style="text-align: center;">۹</td>
-            <td><strong>SDO (MISO)</strong></td>
-            <td><em>آزاد (اختیاری)</em></td>
-            <td><code>GPIO12</code></td>
-            <td><span class="pin-badge pin-spi">HSPI MISO</span></td>
-            <td>خواندن داده از LCD (برای نوشتن تصویر نیازی به اتصال نیست)</td>
+          <!-- دسته دوم: تاچ -->
+          <tr style="background: rgba(168, 85, 247, 0.08);">
+            <td colspan="6" style="font-weight: 800; color: var(--purple); padding: 8px 16px;">
+              🎀 دسته دوم: کابل فلت ۵ تایی تاچ (پین‌های ۱۰ تا ۱۴ نمایشگر)
+            </td>
           </tr>
           <tr>
             <td style="text-align: center;">۱۰</td>
@@ -793,15 +797,15 @@
             <td><strong>D5</strong></td>
             <td><code>GPIO14</code></td>
             <td><span class="pin-badge pin-spi">TOUCH CLOCK</span></td>
-            <td>کلاک کنترلر تاچ (مشترک با پایه SCK نمایشگر)</td>
+            <td>کلاک تاچ (مشترک با پایه D5 نمایشگر)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۱۱</td>
             <td><strong>T_CS</strong></td>
-            <td><strong>D2</strong></td>
-            <td><code>GPIO4</code></td>
+            <td><strong>D8</strong></td>
+            <td><code>GPIO15</code></td>
             <td><span class="pin-badge pin-cs">TOUCH CS</span></td>
-            <td>فعال‌ساز مجزای کنترلر تاچ XPT2046 (Active Low)</td>
+            <td>فعال‌ساز تاچ (دقیقاً چسبیده به پین D7 روی برد)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۱۲</td>
@@ -809,7 +813,7 @@
             <td><strong>D7</strong></td>
             <td><code>GPIO13</code></td>
             <td><span class="pin-badge pin-spi">TOUCH MOSI</span></td>
-            <td>ورودی دیتای تاچ (مشترک با پایه SDI نمایشگر)</td>
+            <td>ورودی دیتای تاچ (مشترک با پایه D7 نمایشگر)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۱۳</td>
@@ -817,15 +821,15 @@
             <td><strong>D6</strong></td>
             <td><code>GPIO12</code></td>
             <td><span class="pin-badge pin-spi">TOUCH MISO</span></td>
-            <td>خروجی دیتای مختصات لمس به نودام‌سی‌یو</td>
+            <td>خروجی قرائت مختصات تاچ (متصل به پین D6 بین D5 و D7)</td>
           </tr>
           <tr>
             <td style="text-align: center;">۱۴</td>
             <td><strong>T_IRQ</strong></td>
-            <td><strong>D3</strong> (یا آزاد)</td>
-            <td><code>GPIO0</code></td>
+            <td><strong>D0</strong> (یا آزاد)</td>
+            <td><code>GPIO16</code></td>
             <td><span class="pin-badge pin-ctrl">TOUCH IRQ</span></td>
-            <td>پایه وقفه تشخیص لمس (کد به صورت خودکار با روش Polling نیز کار می‌کند)</td>
+            <td>وقفه تشخیص لمس (اختیاری)</td>
           </tr>
         </tbody>
       </table>
@@ -834,10 +838,10 @@
     <div class="alert alert-warning">
       <i class="fa-solid fa-triangle-exclamation" style="font-size: 1.3rem; margin-top: 2px;"></i>
       <div>
-        <strong>هشدار وضعیت پایه‌های حساس هنگام بوت (ESP8266 Boot Strapping Pins):</strong>
+        <strong>بررسی وضعیت پایه‌های بوت در چیدمان جدید (Boot Strapping Pins):</strong>
         <ul>
-          <li>پایه <strong>D8 (GPIO15)</strong> باید هنگام روشن شدن حتماً LOW باشد. برد نودام‌سی‌یو دارای پول‌داون داخلی روی این پین است؛ لذا اتصال آن به CS مشکلی در بوت ایجاد نخواهد کرد.</li>
-          <li>پایه <strong>D3 (GPIO0)</strong> هنگام روشن شدن نباید به زمین متصل باشد، در غیر این صورت برد به حالت Flash Mode می‌رود. پین T_IRQ در حالت آزاد خروجی High دارد و خطری ایجاد نمی‌کند.</li>
+          <li>پایه <strong>D8 (GPIO15)</strong> برای <code>TOUCH_CS</code> استفاده شده است. این پایه به دلیل مقاومت پول‌داون داخلی نودام‌سی‌یو در شروع روشن شدن در سطح LOW می‌ماند و هیچ تداخلی با بوت ایجاد نمی‌کند.</li>
+          <li>پایه <strong>D3 (GPIO0)</strong> به <code>DC</code> نمایشگر متصل است که ورودی امپدانس بالا بوده و مقاومت پول‌آپ داخلی نودام‌سی‌یو آن را در زمان بوت HIGH نگه می‌دارد؛ بنابراین برد به اشتباه وارد مد دانلود نخواهد شد.</li>
         </ul>
       </div>
     </div>
@@ -850,9 +854,9 @@
       <div class="step-card">
         <div class="step-num">۱</div>
         <div class="step-content">
-          <h4>سیم‌بندی روی بردبورد یا با سیم‌های جامپر مادگی به نری</h4>
+          <h4>سیم‌بندی مرتب با کابل فلت (Ribbon Cable)</h4>
           <p>
-            طبق جدول اتصالات بالا، ابتدا پین‌های تغذیه (VCC و GND) و سپس پین‌های مشترک SPI یعنی کلاک (D5) و دیتا (D7) را متصل نمایید. در انتها خطوط کنترلی CS نمایشگر (D8) و تاچ (D2) را متصل کنید. دقت نمایید که تغذیه ماژول از خروجی 3V3 نودام‌سی‌یو تأمین گردد.
+            طبق جدول اتصالات بالا، کابل فلت ۸ تایی تصویر را متصل کنید. پایه‌های ۳ و ۴ و ۵ نمایشگر (CS, RESET, DC) به صورت کاملاً متوالی و مستقیم به پایه‌های <strong>D1, D2, D3</strong> برد NodeMCU وصل می‌شوند. سپس کابل فلت ۵ تایی تاچ را متصل کنید که پین فعال‌ساز تاچ به <strong>D8</strong> (کنار D7) وصل می‌گردد.
           </p>
         </div>
       </div>
@@ -987,45 +991,37 @@
  *    - کنترلر لمسی: XPT2046 (ارتباط SPI مجزا)
  * 2. برد توسعه NodeMcu دارای هسته وای‌فای ESP8266 و مبدل CH340 (کد کالا: COM-03-009)
  * 
- * اتصالات پین‌ها (Wiring Pinout):
- * VCC -> 3V3  |  GND -> GND  |  CS -> D8 (GPIO15)  |  RESET -> D0 (GPIO16)
- * DC -> D1 (GPIO5)  |  SDI(MOSI) -> D7 (GPIO13)   |  SCK -> D5 (GPIO14)
- * LED -> 3V3  |  T_CLK -> D5 |  T_CS -> D2 (GPIO4)|  T_DIN -> D7 | T_DO -> D6 (GPIO12)
+ * اتصالات پین‌ها (سیم‌بندی منظم و متوالی یک‌طرفه):
+ * VCC -> 3V3  |  GND -> GND  |  CS -> D1 (GPIO5)  |  RESET -> D2 (GPIO4)
+ * DC -> D3 (GPIO0)  |  SDI(MOSI) -> D7 (GPIO13)   |  SCK -> D5 (GPIO14)
+ * LED -> 3V3  |  T_CLK -> D5 |  T_CS -> D8 (GPIO15)|  T_DIN -> D7 | T_DO -> D6 (GPIO12)
  **********************************************************************************/
 
 #include &lt;SPI.h&gt;
 #include &lt;Adafruit_GFX.h&gt;
 #include &lt;Adafruit_ILI9341.h&gt;
 #include &lt;XPT2046_Touchscreen.h&gt;
+#include &lt;EEPROM.h&gt;
 
-#define TFT_CS    D8    // GPIO15
-#define TFT_DC    D1    // GPIO5
-#define TFT_RST   D0    // GPIO16
-#define TOUCH_CS  D2    // GPIO4
+#define TFT_CS    D1    // GPIO5  -> متناظر پین 3 نمایشگر
+#define TFT_RST   D2    // GPIO4  -> متناظر پین 4 نمایشگر
+#define TFT_DC    D3    // GPIO0  -> متناظر پین 5 نمایشگر
+#define TOUCH_CS  D8    // GPIO15 -> متناظر پین 11 نمایشگر
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
 XPT2046_Touchscreen ts(TOUCH_CS);
 
-#define TS_MINX 240
-#define TS_MAXX 3820
-#define TS_MINY 260
-#define TS_MAXY 3800
+#define EEPROM_MAGIC 0x4341
+const int CALIB_P1_X = 30;
+const int CALIB_P1_Y = 30;
+const int CALIB_P2_X = 290;
+const int CALIB_P2_Y = 210;
 
-const uint16_t PALETTE_COLORS[] = {
-  ILI9341_WHITE, ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE,
-  ILI9341_YELLOW, ILI9341_CYAN, ILI9341_MAGENTA, ILI9341_ORANGE
-};
-uint16_t currentColor = ILI9341_YELLOW;
-int brushSize = 3;
-
-const int CANVAS_X = 65;
-const int CANVAS_Y = 38;
-const int CANVAS_W = 250;
-const int CANVAS_H = 196;
-
-int lastTouchX = -1;
-int lastTouchY = -1;
-bool isTouching = false;
+int cal_p1_rawX = 700;
+int cal_p1_rawY = 3400;
+int cal_p2_rawX = 3400;
+int cal_p2_rawY = 600;
+bool cal_swapXY = true;
 
 bool getTouchCoordinates(int &amp;screenX, int &amp;screenY, int &amp;rawX, int &amp;rawY, int &amp;rawZ) {
   if (!ts.touched()) return false;
@@ -1033,10 +1029,18 @@ bool getTouchCoordinates(int &amp;screenX, int &amp;screenY, int &amp;rawX, int 
   rawX = p.x; rawY = p.y; rawZ = p.z;
   if (rawZ &lt; 300) return false;
 
-  screenX = map(rawX, TS_MINX, TS_MAXX, 0, tft.width());
-  screenY = map(rawY, TS_MINY, TS_MAXY, 0, tft.height());
-  screenX = constrain(screenX, 0, tft.width() - 1);
-  screenY = constrain(screenY, 0, tft.height() - 1);
+  int raw_h = cal_swapXY ? rawY : rawX;
+  int raw_v = cal_swapXY ? rawX : rawY;
+  int h1 = cal_swapXY ? cal_p1_rawY : cal_p1_rawX;
+  int h2 = cal_swapXY ? cal_p2_rawY : cal_p2_rawX;
+  int v1 = cal_swapXY ? cal_p1_rawX : cal_p1_rawY;
+  int v2 = cal_swapXY ? cal_p2_rawX : cal_p2_rawY;
+
+  long mx = (long)CALIB_P1_X + (long)(raw_h - h1) * (CALIB_P2_X - CALIB_P1_X) / (h2 - h1);
+  long my = (long)CALIB_P1_Y + (long)(raw_v - v1) * (CALIB_P2_Y - CALIB_P1_Y) / (v2 - v1);
+
+  screenX = constrain((int)mx, 0, tft.width() - 1);
+  screenY = constrain((int)my, 0, tft.height() - 1);
   return true;
 }
 
@@ -1047,30 +1051,19 @@ void setup() {
   tft.fillScreen(ILI9341_BLACK);
 
   ts.begin();
-  ts.setRotation(1);
+  ts.setRotation(0); // دریافت داده‌های خام بدون دستکاری کتابخانه
 
+  EEPROM.begin(64);
+  // بارگذاری ضرایب کالیبراسیون از EEPROM در صورت وجود...
   initUserInterface();
 }
 
 void loop() {
-  int sx, sy, rx, ry, rz;
-  if (getTouchCoordinates(sx, sy, rx, ry, rz)) {
-    Serial.printf("[TOUCH] Raw: X=%d Y=%d Z=%d -> Screen: X=%d Y=%d\n", rx, ry, rz, sx, sy);
-    if (sx &gt;= CANVAS_X &amp;&amp; sx &lt;= (CANVAS_X + CANVAS_W) &amp;&amp;
-        sy &gt;= CANVAS_Y &amp;&amp; sy &lt;= (CANVAS_Y + CANVAS_H)) {
-      if (isTouching &amp;&amp; lastTouchX != -1) {
-        tft.drawLine(lastTouchX, lastTouchY, sx, sy, currentColor);
-      }
-      tft.fillCircle(sx, sy, brushSize, currentColor);
-      lastTouchX = sx;
-      lastTouchY = sy;
-    }
-    isTouching = true;
-  } else {
-    isTouching = false;
-    lastTouchX = -1;
+  if (Serial.available()) {
+    char c = Serial.read();
+    if (c == 'c' || c == 'C') runTouchCalibration(); // اجرای ویزارد کالیبراسیون
   }
-  delay(10);
+  // پردازش لمس و ترسیم بوم...
 }</code></pre>
     </div>
 

@@ -12,60 +12,80 @@
  * - Adafruit ILI9341 (توسط Adafruit)
  * - XPT2046_Touchscreen (توسط Paul Stoffregen)
  * 
- * اتصالات پین‌ها (Wiring Pinout):
+ * اتصالات پین‌ها (Wiring Pinout - چیدمان منظم و پشت سر هم):
  * ---------------------------------------------------------------------------------
  * پایه نمایشگر (TFT & Touch)  | پایه NodeMCU (ESP8266) | عملکرد پین
  * ---------------------------------------------------------------------------------
- * VCC                        | 3V3                     | تغذیه 3.3 ولت
- * GND                        | GND                     | زمین مدار
- * CS                         | D8 (GPIO15)             | انتخاب تراشه نمایشگر (TFT Chip Select)
- * RESET                      | D0 (GPIO16)             | ریست سخت‌افزاری نمایشگر
- * DC (or RS)                 | D1 (GPIO5)              | انتخاب دستور / داده (Data/Command)
- * SDI (MOSI)                 | D7 (GPIO13)             | گذرگاه سخت‌افزاری SPI MOSI (مشترک)
- * SCK (CLK)                  | D5 (GPIO14)             | کلاک سخت‌افزاری SPI SCK (مشترک)
- * LED (BLK)                  | 3V3                     | نور پس‌زمینه (روشن دائم)
- * SDO (MISO)                 | D6 (GPIO12)             | خروجی تصویر (اختیاری - در صورت عدم نیاز آزاد)
- * T_CLK                      | D5 (GPIO14)             | کلاک تاچ SPI (مشترک با SCK نمایشگر)
- * T_CS                       | D2 (GPIO4)              | انتخاب تراشه تاچ (Touch Chip Select)
- * T_DIN                      | D7 (GPIO13)             | دیتای ورودی تاچ (مشترک با MOSI نمایشگر)
- * T_DO                       | D6 (GPIO12)             | دیتای خروجی تاچ (متصل به MISO)
- * T_IRQ                      | D3 (GPIO0) یا نامتصل    | وقفه تاچ (اختیاری)
+ * 1. VCC                     | 3V3                     | تغذیه 3.3 ولت (کنار D4)
+ * 2. GND                     | GND                     | زمین مدار (کنار 3V3)
+ * 3. CS                      | D1 (GPIO5)              | انتخاب تراشه نمایشگر (متوالی با پین 3)
+ * 4. RESET                   | D2 (GPIO4)              | ریست نمایشگر (متوالی با پین 4)
+ * 5. DC (or RS)              | D3 (GPIO0)              | دستور / داده نمایشگر (متوالی با پین 5)
+ * 6. SDI (MOSI)              | D7 (GPIO13)             | گذرگاه سخت‌افزاری SPI MOSI
+ * 7. SCK (CLK)               | D5 (GPIO14)             | کلاک سخت‌افزاری SPI SCK
+ * 8. LED (BLK)               | 3V3                     | نور پس‌زمینه (روشن دائم)
+ * 9. SDO (MISO)              | آزاد (اختیاری)          | خروجی دیتای تصویر
+ * 10. T_CLK                  | D5 (GPIO14)             | کلاک تاچ (مشترک با SCK نمایشگر)
+ * 11. T_CS                   | D8 (GPIO15)             | انتخاب تراشه تاچ (کنار D7)
+ * 12. T_DIN                  | D7 (GPIO13)             | دیتای ورودی تاچ (مشترک با MOSI)
+ * 13. T_DO                   | D6 (GPIO12)             | دیتای خروجی تاچ (متصل به MISO)
+ * 14. T_IRQ                  | D0 (GPIO16) یا نامتصل   | وقفه تاچ (اختیاری)
  * ---------------------------------------------------------------------------------
+ * 
+ * ویژگی‌های جدید این نسخه:
+ * ۱. اصلاح تطبیق زاویه و جهت محورهای لمسی و رفع جابجایی افقی/عمودی (Landscape 320x240)
+ * ۲. ابزار کالیبراسیون تعاملی ۲ نقطه‌ای روی صفحه نمایش (دکمه CALIB یا ارسال حرف c در سریال)
+ * ۳. ذخیره دائمی ضرایب کالیبراسیون در حافظه فلش EEPROM برد ESP8266
  **********************************************************************************/
 
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
 #include <XPT2046_Touchscreen.h>
+#include <EEPROM.h>
 
 // =================================================================================
-// 1. تعریف پایه‌های اتصال (Pin Definitions)
+// 1. تعریف پایه‌های اتصال متوالی و منظم (Sequential Orderly Pinout)
 // =================================================================================
-#define TFT_CS    D8    // GPIO15
-#define TFT_DC    D1    // GPIO5
-#define TFT_RST   D0    // GPIO16 (در صورت اتصال به پایه RST نودام‌سی‌یو، مقدار 1- قرار دهید)
+#define TFT_CS    D1    // GPIO5  -> متناظر مستقیم با پین 3 نمایشگر (CS)
+#define TFT_RST   D2    // GPIO4  -> متناظر مستقیم با پین 4 نمایشگر (RESET)
+#define TFT_DC    D3    // GPIO0  -> متناظر مستقیم با پین 5 نمایشگر (DC)
 
-#define TOUCH_CS  D2    // GPIO4
-#define TOUCH_IRQ D3    // GPIO0 (اختیاری؛ برای حالت بدون وقفه نامتصل و مقدار 255 بگذارید)
+#define TOUCH_CS  D8    // GPIO15 -> متناظر با پین 11 نمایشگر (T_CS)
+#define TOUCH_IRQ D0    // GPIO16 -> متناظر با پین 14 نمایشگر (T_IRQ - اختیاری)
 
 // ساخت اشیاء نمایشگر و تاچ
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_RST);
-XPT2046_Touchscreen ts(TOUCH_CS); // در صورت استفاده از IRQ: XPT2046_Touchscreen ts(TOUCH_CS, TOUCH_IRQ);
+XPT2046_Touchscreen ts(TOUCH_CS);
 
 // =================================================================================
-// 2. تنظیمات کالیبراسیون تاچ (Touch Calibration Settings)
-// مقادیر خام مبدل آنالوگ به دیجیتال 12 بیتی (200 الی 3800)
+// 2. تنظیمات کالیبراسیون تاچ و تطبیق محورها (Touch Calibration & Mapping)
 // =================================================================================
-#define TS_MINX 240
-#define TS_MAXX 3820
-#define TS_MINY 260
-#define TS_MAXY 3800
+#define EEPROM_MAGIC 0x4341  // کد شناسه اعتبارسنجی ذخیره‌سازی در EEPROM ('CA')
 
-// تنظیمات چرخش و تطبیق محورها (در صورت لزوم جهت اصلاح لمس تغییر دهید)
-#define ROTATION_MODE 1   // 1 = Landscape (افقی 320x240)
-#define INVERT_TOUCH_X false
-#define INVERT_TOUCH_Y false
-#define SWAP_TOUCH_XY  false
+// مختصات دو نقطه استاندارد کالیبراسیون روی صفحه نمایش
+const int CALIB_P1_X = 30;   // هدف نقطه ۱ (بالا-چپ)
+const int CALIB_P1_Y = 30;
+const int CALIB_P2_X = 290;  // هدف نقطه ۲ (پایین-راست)
+const int CALIB_P2_Y = 210;
+
+// مقادیر کالیبراسیون پیش‌فرض بهینه شده برای جهت لنداسکیپ (Landscape Rotation 1)
+// در صورت تمایل می‌توانید با زدن دکمه CALIB یا تایپ c در سریال کالیبره مجدد انجام دهید
+int cal_p1_rawX = 700;
+int cal_p1_rawY = 3400;
+int cal_p2_rawX = 3400;
+int cal_p2_rawY = 600;
+bool cal_swapXY = true;
+
+// ساختار ذخیره اطلاعات در EEPROM
+struct TouchCalibrationData {
+  uint16_t magic;
+  int16_t  p1_x;
+  int16_t  p1_y;
+  int16_t  p2_x;
+  int16_t  p2_y;
+  bool     swap;
+};
 
 // =================================================================================
 // 3. پالت رنگ‌ها و تعریف اجزای رابط کاربری (UI)
@@ -106,8 +126,18 @@ int lastTouchY = -1;
 unsigned long lastTouchTime = 0;
 bool isTouching = false;
 
+// پیش‌اعلان توابع
+void initUserInterface();
+void drawCanvasArea();
+void drawToolPanel();
+void drawHeader(const char* title, uint16_t titleColor = ILI9341_WHITE);
+void updateTouchStatusIndicator(bool active, int sx, int sy);
+void runGraphicsDemo();
+void runTouchCalibration();
+void drawCrosshair(int x, int y, uint16_t color);
+
 // =================================================================================
-// توابع تبدیل و نگاشت مختصات لمسی (Coordinate Mapping)
+// توابع تبدیل و نگاشت دقیق مختصات لمسی (Coordinate Mapping)
 // =================================================================================
 bool getTouchCoordinates(int &screenX, int &screenY, int &rawX, int &rawY, int &rawZ) {
   if (!ts.touched()) {
@@ -124,30 +154,39 @@ bool getTouchCoordinates(int &screenX, int &screenY, int &rawX, int &rawY, int &
     return false;
   }
 
-  int tx = rawX;
-  int ty = rawY;
+  int raw_h = 0;
+  int raw_v = 0;
+  int h1 = 0, h2 = 0;
+  int v1 = 0, v2 = 0;
 
-  if (SWAP_TOUCH_XY) {
-    int temp = tx;
-    tx = ty;
-    ty = temp;
+  // تطبیق محورها بر اساس کالیبراسیون
+  if (cal_swapXY) {
+    raw_h = rawY;
+    raw_v = rawX;
+    h1 = cal_p1_rawY;
+    h2 = cal_p2_rawY;
+    v1 = cal_p1_rawX;
+    v2 = cal_p2_rawX;
+  } else {
+    raw_h = rawX;
+    raw_v = rawY;
+    h1 = cal_p1_rawX;
+    h2 = cal_p2_rawX;
+    v1 = cal_p1_rawY;
+    v2 = cal_p2_rawY;
   }
 
-  // نگاشت مختصات خام به ابعاد صفحه بر اساس چرخش لنداسکیپ (Landscape 320x240)
-  // در حالت Rotation 1 (ILI9341):
-  // معمولاً محور X تاچ متناظر با محور X صفحه و محور Y متناظر با Y صفحه است
-  int mappedX = map(tx, TS_MINX, TS_MAXX, 0, tft.width());
-  int mappedY = map(ty, TS_MINY, TS_MAXY, 0, tft.height());
-
-  if (INVERT_TOUCH_X) {
-    mappedX = tft.width() - mappedX;
-  }
-  if (INVERT_TOUCH_Y) {
-    mappedY = tft.height() - mappedY;
+  // جلوگیری از خطای تقسیم بر صفر
+  if (h2 == h1 || v2 == v1) {
+    return false;
   }
 
-  screenX = constrain(mappedX, 0, tft.width() - 1);
-  screenY = constrain(mappedY, 0, tft.height() - 1);
+  // درونیابی خطی دو نقطه‌ای مستقل از جهت و معکوس بودن
+  long mappedX = (long)CALIB_P1_X + (long)(raw_h - h1) * (CALIB_P2_X - CALIB_P1_X) / (h2 - h1);
+  long mappedY = (long)CALIB_P1_Y + (long)(raw_v - v1) * (CALIB_P2_Y - CALIB_P1_Y) / (v2 - v1);
+
+  screenX = constrain((int)mappedX, 0, tft.width() - 1);
+  screenY = constrain((int)mappedY, 0, tft.height() - 1);
 
   return true;
 }
@@ -159,7 +198,6 @@ void drawCanvasArea() {
   tft.fillRect(CANVAS_X, CANVAS_Y, CANVAS_W, CANVAS_H, COLOR_CANVAS);
   tft.drawRect(CANVAS_X - 1, CANVAS_Y - 1, CANVAS_W + 2, CANVAS_H + 2, COLOR_BORDER);
   
-  // متن راهنمای درون بوم
   tft.setTextSize(1);
   tft.setTextColor(0x52AA);
   tft.setCursor(CANVAS_X + 25, CANVAS_Y + CANVAS_H / 2 - 5);
@@ -169,7 +207,7 @@ void drawCanvasArea() {
 // =================================================================================
 // ترسیم سربرگ و نوار بالایی (Header Bar)
 // =================================================================================
-void drawHeader(const char* title, uint16_t titleColor = ILI9341_WHITE) {
+void drawHeader(const char* title, uint16_t titleColor) {
   tft.fillRect(0, 0, 320, 32, COLOR_HEADER);
   tft.drawFastHLine(0, 32, 320, COLOR_BORDER);
 
@@ -182,7 +220,6 @@ void drawHeader(const char* title, uint16_t titleColor = ILI9341_WHITE) {
   tft.setCursor(6, 18);
   tft.print(title);
 
-  // نشانگر وضعیت اتصال لمسی در گوشه بالا راست
   updateTouchStatusIndicator(false, 0, 0);
 }
 
@@ -220,19 +257,18 @@ void drawToolPanel() {
   // عنوان بخش پالت
   tft.setTextSize(1);
   tft.setTextColor(ILI9341_WHITE);
-  tft.setCursor(8, 38);
+  tft.setCursor(12, 36);
   tft.print("COLORS");
 
-  // رسم دکمه‌های انتخاب رنگ
-  int startY = 50;
-  int btnH = 15;
+  // رسم پالت رنگ‌ها
+  int startY = 47;
+  int btnH = 12;
   int btnW = 46;
 
   for (int i = 0; i < NUM_COLORS; i++) {
-    int by = startY + (i * (btnH + 3));
+    int by = startY + (i * (btnH + 2));
     tft.fillRect(8, by, btnW, btnH, PALETTE_COLORS[i]);
     
-    // اگر رنگ جاری باشد، حاشیه ضخیم سفید بکش
     if (PALETTE_COLORS[i] == currentColor) {
       tft.drawRect(6, by - 2, btnW + 4, btnH + 4, ILI9341_WHITE);
       tft.drawRect(7, by - 1, btnW + 2, btnH + 2, ILI9341_BLACK);
@@ -241,19 +277,26 @@ void drawToolPanel() {
     }
   }
 
-  // دکمه پاکسازی بوم (CLEAR)
-  tft.fillRect(6, 196, 50, 18, 0xC800); // قرمز تیره
-  tft.drawRect(6, 196, 50, 18, ILI9341_WHITE);
+  // 1. دکمه CLEAR
+  tft.fillRect(6, 164, 50, 18, 0xC800); // قرمز تیره
+  tft.drawRect(6, 164, 50, 18, ILI9341_WHITE);
   tft.setTextColor(ILI9341_WHITE);
-  tft.setCursor(14, 201);
+  tft.setCursor(14, 169);
   tft.print("CLEAR");
 
-  // دکمه تست گرافیک (TEST)
-  tft.fillRect(6, 218, 50, 18, 0x03E0); // سبز متمایل به تیره
-  tft.drawRect(6, 218, 50, 18, ILI9341_WHITE);
+  // 2. دکمه TEST
+  tft.fillRect(6, 187, 50, 18, 0x03E0); // سبز تیره
+  tft.drawRect(6, 187, 50, 18, ILI9341_WHITE);
   tft.setTextColor(ILI9341_WHITE);
-  tft.setCursor(17, 223);
+  tft.setCursor(17, 192);
   tft.print("TEST");
+
+  // 3. دکمه CALIB (کالیبراسیون لمس)
+  tft.fillRect(6, 210, 50, 18, 0x001F); // آبی تیره
+  tft.drawRect(6, 210, 50, 18, ILI9341_WHITE);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setCursor(14, 215);
+  tft.print("CALIB");
 }
 
 // =================================================================================
@@ -276,7 +319,6 @@ void runGraphicsDemo() {
   tft.setCursor(40, 70);
   tft.println("Controller: NodeMCU ESP8266 @ 80/160MHz");
 
-  // 1. میله‌های طیف رنگ اصلی (Color Bars)
   const uint16_t bars[] = {
     ILI9341_RED, ILI9341_GREEN, ILI9341_BLUE, 
     ILI9341_YELLOW, ILI9341_CYAN, ILI9341_MAGENTA, ILI9341_WHITE
@@ -287,7 +329,6 @@ void runGraphicsDemo() {
   }
   tft.drawRect(9, 89, (barW * 7) + 2, 27, ILI9341_WHITE);
 
-  // 2. ترسیم دایره‌ها و اشکال هم‌مرکز
   int cx = 70;
   int cy = 175;
   for (int r = 10; r <= 45; r += 7) {
@@ -295,14 +336,12 @@ void runGraphicsDemo() {
   }
   tft.fillCircle(cx, cy, 6, ILI9341_RED);
 
-  // 3. ترسیم مستطیل‌های تو در تو
   int rx = 160;
   int ry = 175;
   for (int s = 10; s <= 45; s += 7) {
     tft.drawRect(rx - s, ry - s, s * 2, s * 2, ILI9341_CYAN);
   }
 
-  // 4. ترسیم مثلث‌ها و خطوط شعاعی
   int tx = 265;
   int ty = 175;
   for (int i = 0; i < 360; i += 45) {
@@ -317,9 +356,9 @@ void runGraphicsDemo() {
   tft.setCursor(55, 228);
   tft.println("TOUCH SCREEN TO RETURN TO CANVAS");
 
-  // انتظار برای لمس صفحه توسط کاربر جهت بازگشت
   unsigned long startWait = millis();
   while (millis() - startWait < 8000) {
+    yield();
     if (ts.touched()) {
       TS_Point p = ts.getPoint();
       if (p.z > 300) {
@@ -329,7 +368,167 @@ void runGraphicsDemo() {
     delay(50);
   }
 
-  // بازسازی صفحه کاربری اصلی
+  initUserInterface();
+}
+
+// =================================================================================
+// ترسیم نشانگر هدف کالیبراسیون (Crosshair)
+// =================================================================================
+void drawCrosshair(int x, int y, uint16_t color) {
+  tft.drawFastHLine(x - 12, y, 25, color);
+  tft.drawFastVLine(x, y - 12, 25, color);
+  tft.drawCircle(x, y, 8, color);
+  tft.drawCircle(x, y, 4, color);
+}
+
+// =================================================================================
+// نمونه‌برداری با دقت بالا از نقطه لمس شده حین کالیبراسیون
+// =================================================================================
+void getRawCalibrationPoint(int targetX, int targetY, int &avgRawX, int &avgRawY) {
+  drawCrosshair(targetX, targetY, ILI9341_RED);
+
+  while (true) {
+    yield();
+    if (ts.touched()) {
+      TS_Point p = ts.getPoint();
+      if (p.z > 350) {
+        long sumX = 0;
+        long sumY = 0;
+        int count = 0;
+
+        for (int i = 0; i < 20; i++) {
+          yield();
+          delay(12);
+          if (ts.touched()) {
+            TS_Point pt = ts.getPoint();
+            if (pt.z > 250) {
+              sumX += pt.x;
+              sumY += pt.y;
+              count++;
+            }
+          }
+        }
+
+        if (count >= 8) {
+          avgRawX = sumX / count;
+          avgRawY = sumY / count;
+          drawCrosshair(targetX, targetY, ILI9341_GREEN);
+          delay(300);
+          break;
+        }
+      }
+    }
+    delay(20);
+  }
+
+  // انتظار برای برداشتن قلم از روی صفحه
+  while (ts.touched()) {
+    yield();
+    delay(20);
+  }
+  delay(250);
+}
+
+// =================================================================================
+// اجرای ابزار تعاملی کالیبراسیون ۲ نقطه‌ای (Interactive Calibration Wizard)
+// =================================================================================
+void runTouchCalibration() {
+  Serial.println();
+  Serial.println(F("========================================================="));
+  Serial.println(F(">>> STARTING INTERACTIVE 2-POINT TOUCH CALIBRATION <<<   "));
+  Serial.println(F("========================================================="));
+
+  tft.fillScreen(ILI9341_BLACK);
+
+  // نوار عنوان
+  tft.fillRect(0, 0, 320, 26, 0x0010);
+  tft.drawFastHLine(0, 26, 320, ILI9341_CYAN);
+  tft.setTextSize(1);
+  tft.setTextColor(ILI9341_CYAN);
+  tft.setCursor(65, 9);
+  tft.println("TOUCH SCREEN CALIBRATION WIZARD");
+
+  // ۱. نقطه اول: بالا - چپ
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setCursor(35, 95);
+  tft.println("1/2: Touch the red target [+] at TOP-LEFT");
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setCursor(35, 115);
+  tft.println("Use stylus or fingernail firmly...");
+
+  int raw1X = 0, raw1Y = 0;
+  getRawCalibrationPoint(CALIB_P1_X, CALIB_P1_Y, raw1X, raw1Y);
+  Serial.printf("[CALIB] Target 1 (%d, %d) captured -> Raw: X=%d, Y=%d\n",
+                CALIB_P1_X, CALIB_P1_Y, raw1X, raw1Y);
+
+  delay(300);
+
+  // پاک کردن نقطه اول و متن
+  tft.fillRect(CALIB_P1_X - 14, CALIB_P1_Y - 14, 29, 29, ILI9341_BLACK);
+  tft.fillRect(20, 80, 280, 70, ILI9341_BLACK);
+
+  // ۲. نقطه دوم: پایین - راست
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setCursor(30, 95);
+  tft.println("2/2: Touch red target [+] at BOTTOM-RIGHT");
+  tft.setTextColor(COLOR_ACCENT);
+  tft.setCursor(30, 115);
+  tft.println("Use stylus or fingernail firmly...");
+
+  int raw2X = 0, raw2Y = 0;
+  getRawCalibrationPoint(CALIB_P2_X, CALIB_P2_Y, raw2X, raw2Y);
+  Serial.printf("[CALIB] Target 2 (%d, %d) captured -> Raw: X=%d, Y=%d\n",
+                CALIB_P2_X, CALIB_P2_Y, raw2X, raw2Y);
+
+  // به‌روزرسانی مقادیر فعال
+  cal_p1_rawX = raw1X;
+  cal_p1_rawY = raw1Y;
+  cal_p2_rawX = raw2X;
+  cal_p2_rawY = raw2Y;
+
+  // تشخیص خودکار جابجایی محورها
+  int deltaRawX = abs(raw2X - raw1X);
+  int deltaRawY = abs(raw2Y - raw1Y);
+  cal_swapXY = (deltaRawY > deltaRawX);
+
+  // ذخیره در حافظه فلش EEPROM
+  TouchCalibrationData data;
+  data.magic = EEPROM_MAGIC;
+  data.p1_x  = (int16_t)cal_p1_rawX;
+  data.p1_y  = (int16_t)cal_p1_rawY;
+  data.p2_x  = (int16_t)cal_p2_rawX;
+  data.p2_y  = (int16_t)cal_p2_rawY;
+  data.swap  = cal_swapXY;
+  EEPROM.put(0, data);
+  EEPROM.commit();
+
+  // چاپ گزارش جامع در مانیتور سریال
+  Serial.println(F("---------------------------------------------------------"));
+  Serial.println(F("CALIBRATION CALCULATIONS & RESULTS:"));
+  Serial.printf("  Point 1 (Top-Left):     Screen(%d, %d)  -> Raw(X=%d, Y=%d)\n", CALIB_P1_X, CALIB_P1_Y, raw1X, raw1Y);
+  Serial.printf("  Point 2 (Bottom-Right): Screen(%d, %d) -> Raw(X=%d, Y=%d)\n", CALIB_P2_X, CALIB_P2_Y, raw2X, raw2Y);
+  Serial.printf("  Delta Raw X: %d | Delta Raw Y: %d\n", deltaRawX, deltaRawY);
+  Serial.printf("  Detected Swap Axes: %s\n", cal_swapXY ? "YES (Horizontal=Raw Y, Vertical=Raw X)" : "NO");
+  Serial.println(F("  Status: Successfully written to EEPROM flash!"));
+  Serial.println(F("========================================================="));
+
+  // نمایش تاییدیه روی صفحه نمایش
+  tft.fillScreen(ILI9341_BLACK);
+  tft.fillRect(20, 65, 280, 110, 0x01E0);
+  tft.drawRect(20, 65, 280, 110, ILI9341_WHITE);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextSize(2);
+  tft.setCursor(45, 85);
+  tft.println("CALIBRATION OK!");
+  tft.setTextSize(1);
+  tft.setTextColor(ILI9341_YELLOW);
+  tft.setCursor(45, 120);
+  tft.println("Saved to EEPROM Flash memory.");
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setCursor(45, 140);
+  tft.println("Loading canvas...");
+
+  delay(1800);
   initUserInterface();
 }
 
@@ -350,33 +549,40 @@ void initUserInterface() {
 // مدیریت کلیک روی دکمه‌های نوار ابزار سمت چپ
 // =================================================================================
 void handleToolPanelTouch(int sx, int sy) {
-  // دکمه CLEAR
-  if (sx >= 6 && sx <= 56 && sy >= 196 && sy <= 214) {
+  // ۱. دکمه CLEAR
+  if (sx >= 6 && sx <= 56 && sy >= 164 && sy <= 182) {
     Serial.println(F("[ACTION] Clear Canvas pressed."));
     drawCanvasArea();
     delay(150);
     return;
   }
 
-  // دکمه TEST
-  if (sx >= 6 && sx <= 56 && sy >= 218 && sy <= 236) {
+  // ۲. دکمه TEST
+  if (sx >= 6 && sx <= 56 && sy >= 187 && sy <= 205) {
     Serial.println(F("[ACTION] Test Benchmark pressed."));
     runGraphicsDemo();
     return;
   }
 
+  // ۳. دکمه CALIB
+  if (sx >= 6 && sx <= 56 && sy >= 210 && sy <= 228) {
+    Serial.println(F("[ACTION] Calibrate Wizard pressed."));
+    runTouchCalibration();
+    return;
+  }
+
   // بررسی انتخاب رنگ از پالت
-  int startY = 50;
-  int btnH = 15;
+  int startY = 47;
+  int btnH = 12;
   int btnW = 46;
 
   for (int i = 0; i < NUM_COLORS; i++) {
-    int by = startY + (i * (btnH + 3));
+    int by = startY + (i * (btnH + 2));
     if (sx >= 8 && sx <= (8 + btnW) && sy >= by && sy <= (by + btnH)) {
       currentColor = PALETTE_COLORS[i];
       Serial.print(F("[ACTION] Color selected: 0x"));
       Serial.println(currentColor, HEX);
-      drawToolPanel(); // بازطراحی حاشیه رنگ انتخابی
+      drawToolPanel();
       delay(100);
       return;
     }
@@ -400,17 +606,34 @@ void setup() {
   Serial.printf("Free Heap:       %d bytes\n", ESP.getFreeHeap());
   Serial.println(F("Initializing SPI Display & Touch Controller..."));
 
-  // راه‌اندازی نمایشگر TFT
+  // راه‌اندازی نمایشگر TFT در حالت لنداسکیپ (Landscape 320x240)
   tft.begin();
-  tft.setRotation(ROTATION_MODE);
+  tft.setRotation(1);
   tft.fillScreen(ILI9341_BLACK);
 
-  // راه‌اندازی کنترلر تاچ XPT2046
+  // راه‌اندازی کنترلر تاچ XPT2046 در حالت Raw (بدون اعمال چرخش نرم‌افزاری کتابخانه)
   ts.begin();
-  ts.setRotation(ROTATION_MODE);
+  ts.setRotation(0);
+
+  // خواندن ضرایب ذخیره شده در EEPROM
+  EEPROM.begin(64);
+  TouchCalibrationData calData;
+  EEPROM.get(0, calData);
+  if (calData.magic == EEPROM_MAGIC) {
+    cal_p1_rawX = calData.p1_x;
+    cal_p1_rawY = calData.p1_y;
+    cal_p2_rawX = calData.p2_x;
+    cal_p2_rawY = calData.p2_y;
+    cal_swapXY  = calData.swap;
+    Serial.println(F("[CALIB] Successfully loaded calibrated data from EEPROM!"));
+  } else {
+    Serial.println(F("[CALIB] Using pre-calibrated default Landscape parameters."));
+  }
 
   Serial.println(F("Hardware initialized successfully!"));
-  Serial.println(F("Touch screen anywhere or draw on the canvas."));
+  Serial.println(F("NOTE: To calibrate touch screen at any time:"));
+  Serial.println(F("      - Type 'c' in Serial Monitor, OR"));
+  Serial.println(F("      - Press the blue [CALIB] button on the screen panel."));
 
   // بارگذاری صفحه رابط کاربری
   initUserInterface();
@@ -420,6 +643,15 @@ void setup() {
 // حلقه اصلی برنامه (Main Loop)
 // =================================================================================
 void loop() {
+  // دریافت دستور کالیبراسیون از مانیتور سریال
+  if (Serial.available()) {
+    char ch = Serial.read();
+    if (ch == 'c' || ch == 'C') {
+      runTouchCalibration();
+      return;
+    }
+  }
+
   int screenX = 0;
   int screenY = 0;
   int rawX = 0;
@@ -440,7 +672,6 @@ void loop() {
         screenY >= (CANVAS_Y + brushSize) && screenY <= (CANVAS_Y + CANVAS_H - brushSize)) {
       
       if (isTouching && lastTouchX != -1 && lastTouchY != -1) {
-        // برای کشیدن خط ممتد و نرم بین دونقطه متوالی
         tft.drawLine(lastTouchX, lastTouchY, screenX, screenY, currentColor);
         tft.fillCircle(screenX, screenY, brushSize, currentColor);
       } else {
@@ -461,12 +692,11 @@ void loop() {
       isTouching = true;
       updateTouchStatusIndicator(true, screenX, screenY);
     } else {
-      // به‌روزرسانی مختصات زنده
       updateTouchStatusIndicator(true, screenX, screenY);
     }
 
   } else {
-    // در صورت قطع لمس برای بیش از 150 میلی‌ثانیه
+    // قطع لمس
     if (isTouching && (millis() - lastTouchTime > 150)) {
       isTouching = false;
       lastTouchX = -1;
@@ -475,5 +705,5 @@ void loop() {
     }
   }
 
-  delay(10); // تاخیر کوتاه برای پایداری پردازش SPI
+  delay(10);
 }
