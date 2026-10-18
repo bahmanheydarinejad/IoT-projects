@@ -53,6 +53,11 @@ public:
     : Adafruit_GFX(ILI9486_TFTWIDTH, ILI9486_TFTHEIGHT),
       _cs(cs), _dc(dc), _rst(rst) {}
 
+  // تبدیل مؤلفه‌های 8 بیتی قرمز، سبز و آبی به فرمت رنگ 16 بیتی RGB565
+  static inline uint16_t color565(uint8_t r, uint8_t g, uint8_t b) {
+    return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
+  }
+
   void begin(uint32_t freq = 40000000) {
     _spiFreq = freq;
     pinMode(_dc, OUTPUT);
