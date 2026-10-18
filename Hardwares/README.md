@@ -420,6 +420,7 @@
 - `SPI.h`
 
 ### 🌐 پیوندهای مرجع و دیتاشیت
+- 🧪 **دستور کار آزمایشگاهی و تست:** [مشاهده دستور کار تعاملی (index.html)](./tests/ArduinoPro-mini_TFTST7735/index.html) | [کد اسکتچ آردوینو (.ino)](./tests/ArduinoPro-mini_TFTST7735/ArduinoPro-mini_TFTST7735.ino) | [تصویر مدار واقعی (artifact.jpg)](./tests/ArduinoPro-mini_TFTST7735/artifact.jpg)
 - 📄 **دیتاشیت / مستندات سازنده:** [ATmega328P @ 8 MHz Datasheet](https://docs.arduino.cc/retired/boards/arduino-pro-mini)
 - 🛒 **صفحه خرید محصول (Cafe Robot):** [برد آردوینو پرومینی مدل 3.3 ولت - Arduino Pro Mini](https://thecaferobot.com/store/arduino-pro-mini-3-3v)
 
@@ -2680,19 +2681,27 @@
 
 </div>
 
-### 🔌 نیازمندی‌های اتصال و پین‌اوت (Wiring & Pinout)
+### 🔌 نیازمندی‌های اتصال و پین‌اوت کابل فلت ۱۴ پین (14-Pin FPC Pinout - Z144SN005)
+روی فلت یا آداپتور این نمایشگر تنها شماره پین‌های ۱ تا ۱۴ درج شده است. جدول تطبیق سیگنال‌ها بر اساس مپ سخت‌افزاری Z144SN005:
 
 <div dir="ltr">
 
-| پین (Pin Name) | نوع سیگنال (Signal Type) | شرح عملکرد و نحوه اتصال به آردوینو (Description & Connection) |
-|:---:|:---:|:---|
-| `VCC / GND` | **Power** | <div dir="rtl">تغذیه ۳.۳ الی ۵ ولت و زمین</div> |
-| `SCL` | **SPI Clock** | <div dir="rtl">کلاک SPI</div> |
-| `SDA` | **SPI MOSI** | <div dir="rtl">داده خروجی میکرو</div> |
-| `RES` | **Reset** | <div dir="rtl">پایه ریست</div> |
-| `DC` | **Command/Data** | <div dir="rtl">انتخاب رجیستر</div> |
-| `CS` | **Chip Select** | <div dir="rtl">فعالسازی ماژول</div> |
-| `BLK` | **Backlight** | <div dir="rtl">نور پس‌زمینه</div> |
+| پین فلت (Pin #) | نام سیگنال (Signal) | نحوه اتصال به آردوینو ۳.۳ ولت (Arduino 3.3V Connection) | شرح عملکرد (Function) |
+|:---:|:---:|:---|:---|
+| `1` | **NC** | *Not Connected* | پین آزاد |
+| `2` | **GND** | **GND** | زمین مدار |
+| `3` | **LED-** | **GND** | کاتد نور پس‌زمینه |
+| `4` | **LED+** | **3.3V** (با مقاومت سری ۲۲ اهم) یا **D6 (PWM)** | آند نور پس‌زمینه |
+| `5` | **GND** | **GND** | زمین مدار |
+| `6` | **/RESET** | **D8** | ریست سخت‌افزاری (Active Low) |
+| `7` | **A0 / DC** | **D9** | انتخاب داده / فرمان (Data/Command) |
+| `8` | **SDA** | **D11** (Hardware MOSI) | خط دیتای ورودی SPI |
+| `9` | **SCK** | **D13** (Hardware SCK) | خط پالس کلاک SPI |
+| `10` | **VCC** | **3.3V** | تغذیه مدار درایور (۳.۳ ولت) |
+| `11` | **IOVCC** | **3.3V** | تغذیه خطوط دیجیتال (۳.۳ ولت) |
+| `12` | **CS** | **D10** (Hardware SS) | انتخاب تراشه (Active Low) |
+| `13` | **GND** | **GND** | زمین مدار |
+| `14` | **NC** | *Not Connected* | پین آزاد |
 
 </div>
 
@@ -2704,6 +2713,7 @@
 - `Adafruit_GFX.h`
 
 ### 🌐 پیوندهای مرجع و دیتاشیت
+- 🧪 **دستور کار آزمایشگاهی و تست:** [مشاهده دستور کار تعاملی (index.html)](./tests/ArduinoPro-mini_TFTST7735/index.html) | [کد اسکتچ آردوینو (.ino)](./tests/ArduinoPro-mini_TFTST7735/ArduinoPro-mini_TFTST7735.ino) | [تصویر مدار واقعی (artifact.jpg)](./tests/ArduinoPro-mini_TFTST7735/artifact.jpg)
 - 📄 **دیتاشیت / مستندات سازنده:** [Sitronix ST7735 Full Color Datasheet](https://www.crystalfontz.com/controllers/Sitronix/ST7735R/317/)
 - 🛒 **صفحه خرید محصول (Cafe Robot):** [نمایشگر TFT تمام رنگ 1.44 اینچ دارای ارتباط SPI و چیپ درایور ST7735 با کابل فلت 14 پین](https://thecaferobot.com/store/1-44-inch-spi-tft-lcd-with-st7735-driver)
 
