@@ -1,0 +1,766 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>دستور کار آزمایشگاهی: دسته بازی لمسی پلی‌استیشن و گیرنده بی‌سیم NRF24L01+PA+LNA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --bg-primary: #0b132b;
+      --bg-secondary: #1c2541;
+      --bg-card: #1c2541;
+      --bg-card-hover: #263359;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: #334155;
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.2);
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --purple: #a855f7;
+      --code-bg: #0b1120;
+      --font-fa: 'Vazirmatn', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-code: 'JetBrains Mono', monospace;
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #f1f5f9;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --accent: #0284c7;
+      --accent-glow: rgba(2, 132, 199, 0.15);
+      --success: #059669;
+      --warning: #d97706;
+      --danger: #dc2626;
+      --purple: #9333ea;
+      --code-bg: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
+    }
+
+    body {
+      font-family: var(--font-fa);
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      line-height: 1.7;
+      padding-bottom: 80px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+    }
+
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(10px);
+    }
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+    }
+    .nav-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-fa);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: 1px solid transparent;
+      transition: all 0.2s;
+    }
+    .btn-secondary {
+      background: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* Hero */
+    .hero {
+      text-align: center;
+      padding: 45px 0 25px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(56, 189, 248, 0.12);
+      border: 1px solid var(--accent);
+      border-radius: 50px;
+      color: var(--accent);
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+    }
+    .hero h1 {
+      font-size: 2.1rem;
+      font-weight: 800;
+      margin-bottom: 14px;
+      line-height: 1.4;
+      background: linear-gradient(135deg, #38bdf8 0%, #3b82f6 50%, #8b5cf6 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      max-width: 860px;
+      margin: 0 auto 20px;
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+    .tags-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 25px;
+    }
+    .tech-tag {
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-family: var(--font-code);
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 44px 0 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--border-color);
+    }
+    .section-title i {
+      color: var(--accent);
+    }
+
+    /* Dual Simulator */
+    .dual-sim-wrapper {
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+      gap: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 30px;
+    }
+    @media (max-width: 920px) {
+      .dual-sim-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+    .sim-column {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sim-header-label {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Bezel Styles */
+    .bezel-sender {
+      background: #14141d;
+      border: 4px solid #2d2d42;
+      border-radius: 14px;
+      padding: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      width: 100%;
+      max-width: 360px;
+    }
+    .bezel-receiver {
+      background: #1e1e24;
+      border: 4px solid #3b3b4f;
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #senderCanvas {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      background: #0842;
+      display: block;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    #receiverCanvas {
+      width: 220px;
+      height: 220px;
+      image-rendering: pixelated;
+      background: #0842;
+      display: block;
+      border-radius: 6px;
+    }
+
+    /* Cards */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 30px;
+    }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 22px;
+    }
+
+    /* Wiring Table */
+    .wiring-table-wrapper {
+      overflow-x: auto;
+      background: var(--bg-card);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+    .wiring-table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: right;
+      font-size: 0.88rem;
+    }
+    .wiring-table th {
+      background: var(--bg-secondary);
+      padding: 12px 14px;
+      font-weight: 700;
+      color: var(--accent);
+      border-bottom: 2px solid var(--border-color);
+    }
+    .wiring-table td {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .pin-code {
+      font-family: var(--font-code);
+      font-weight: 600;
+      padding: 2px 6px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent);
+      border-radius: 4px;
+    }
+
+    /* Code Container */
+    .code-container {
+      background: var(--code-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+    .code-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      border-bottom: 1px solid var(--border-color);
+      overflow-x: auto;
+    }
+    .code-tab-btn {
+      padding: 10px 18px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-family: var(--font-code);
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 2px solid transparent;
+    }
+    .code-tab-btn.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: rgba(56, 189, 248, 0.05);
+    }
+    pre {
+      padding: 18px;
+      overflow-x: auto;
+      font-family: var(--font-code);
+      font-size: 0.82rem;
+      line-height: 1.6;
+      color: #e2e8f0;
+      max-height: 440px;
+    }
+    footer {
+      margin-top: 60px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="container">
+      <div class="nav-bar">
+        <a href="../../index.html" class="nav-brand">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>داشبورد سخت‌افزار IoT / دسته بازی بی‌سیم پلی‌استیشن و تله‌متری</span>
+        </a>
+        <div class="nav-actions">
+          <a href="../../index.html" class="btn btn-secondary">
+            <i class="fa-solid fa-arrow-right"></i>
+            <span>فهرست کل قطعات</span>
+          </a>
+          <button id="themeToggle" class="btn btn-secondary" title="تغییر تم">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <section class="hero">
+      <div class="hero-badge">
+        <i class="fa-solid fa-tower-broadcast"></i>
+        <span>لینک رادیویی پرقدرت ۱ کیلومتر با امنیت ضدتداخل</span>
+      </div>
+      <h1>دسته بازی لمسی پلی‌استیشن و گیرنده مانیتورینگ تله‌متری</h1>
+      <p>
+        فرستنده لمسی NodeMCU ESP8266 با نمایشگر ۲.۸ اینچ و گیرنده مانیتورینگ Arduino Pro Mini 3.3V با نمایشگر ۱.۴۴ اینچ ST7735 و ماژول‌های تقویت‌شده NRF24L01+PA+LNA در کانال ۱۱۵ (2.515 گیگاهرتز).
+      </p>
+      <div class="tags-row">
+        <span class="tech-tag">NRF24L01+PA+LNA (1km)</span>
+        <span class="tech-tag">Channel 115 (2.515 GHz)</span>
+        <span class="tech-tag">PlayStation Touch UI</span>
+        <span class="tech-tag">12-Button Bitmask</span>
+        <span class="tech-tag">Dual CRC Checksum</span>
+        <span class="tech-tag">Zero Level-Shifter</span>
+      </div>
+    </section>
+
+    <!-- Interactive Dual Simulator -->
+    <h2 class="section-title">
+      <i class="fa-solid fa-satellite-dish"></i>
+      <span>شبیه‌ساز زنده ارتباط دوطرفه رادیویی (Live RF Gamepad Simulator)</span>
+    </h2>
+
+    <div class="dual-sim-wrapper">
+      <!-- Sender Simulator -->
+      <div class="sim-column">
+        <div class="sim-header-label" style="color:var(--accent);">
+          <i class="fa-solid fa-gamepad"></i>
+          <span>فرستنده لمسی: NodeMCU + TFT 2.8"</span>
+        </div>
+        <div class="bezel-sender">
+          <canvas id="senderCanvas" width="320" height="240"></canvas>
+        </div>
+        <p style="font-size:0.8rem; color:var(--text-muted); margin-top:8px;">
+          💡 روی دکمه‌های دسته بازی (D-Pad یا اشکال 🔺⭕❌⬜) کلیک یا لمس کنید تا پکت رادیویی ارسال شود.
+        </p>
+      </div>
+
+      <!-- Receiver Simulator -->
+      <div class="sim-column">
+        <div class="sim-header-label" style="color:var(--success);">
+          <i class="fa-solid fa-tv"></i>
+          <span>گیرنده تله‌متری: Pro Mini + TFT 1.44"</span>
+        </div>
+        <div class="bezel-receiver">
+          <canvas id="receiverCanvas" width="128" height="128"></canvas>
+        </div>
+        <div style="margin-top:10px; display:flex; gap:8px;">
+          <button id="simCutLinkBtn" class="btn btn-secondary" style="font-size:0.8rem; padding:4px 10px;" onclick="toggleSimLink()">
+            <i class="fa-solid fa-link-slash"></i>
+            <span id="cutLinkText">قطع موقت سیگنال رادیویی</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Security & Anti-Interference Features -->
+    <h2 class="section-title">
+      <i class="fa-solid fa-shield-halved"></i>
+      <span>ویژگی‌های ضدتداخل و امنیت پروتکل رادیویی</span>
+    </h2>
+
+    <div class="cards-grid">
+      <div class="card">
+        <h3 style="color:var(--accent); margin-bottom:8px; font-size:1.05rem;"><i class="fa-solid fa-wifi"></i> کانال ۱۱۵ (فرکانس ۲.۵۱۵ گیگاهرتز)</h3>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          کاملاً بالاتر از محدوده فرکانسی وای‌فای‌های خانگی و اداری (2.412 تا 2.484 GHz) و امواج مایکروویو؛ مصون از قطعی یا افت فریم ناشی از هات‌اسپات و روترها.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--success); margin-bottom:8px; font-size:1.05rem;"><i class="fa-solid fa-key"></i> هدر جادویی و توکن شبکه (Network Token)</h3>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          ارسال بایت‌های <code>0xA5, 0x5A</code> و شناسه <code>0xC0DE</code> در هر پکت؛ باعث می‌شود بسته‌های سایر کاربران یا ماژول‌های مجاور فوراً فیلتر و دور ریخته شوند.
+        </p>
+      </div>
+      <div class="card">
+        <h3 style="color:var(--warning); margin-bottom:8px; font-size:1.05rem;"><i class="fa-solid fa-stopwatch"></i> ارسال همزمان کلیدها در هر سیکل</h3>
+        <p style="font-size:0.88rem; color:var(--text-muted);">
+          وضعیت هر ۱۲ کلید درون یک بیت‌ماسک ۱۶ بیتی در هر سیکل ۳۰ تا ۴۰ میلی‌ثانیه‌ای فشرده شده و پکت‌های گم‌شده بلافاصله با بسته جدید جایگزین می‌شوند.
+        </p>
+      </div>
+    </div>
+
+    <!-- Wiring Tables Section -->
+    <h2 class="section-title">
+      <i class="fa-solid fa-network-wired"></i>
+      <span>جدول سیم‌بندی کامل واحدهای فرستنده و گیرنده</span>
+    </h2>
+
+    <div class="wiring-table-wrapper">
+      <table class="wiring-table">
+        <thead>
+          <tr>
+            <th>واحد مدار</th>
+            <th>پایه ماژول</th>
+            <th>پایه پردازنده</th>
+            <th>شرح عملکرد</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>فرستنده (NodeMCU)</strong></td>
+            <td>TFT CS / RST / DC</td>
+            <td><span class="pin-code">D1 / D2 / D3</span></td>
+            <td>خطوط کنترل نمایشگر ۲.۸ اینچ ILI9341</td>
+          </tr>
+          <tr>
+            <td><strong>فرستنده (NodeMCU)</strong></td>
+            <td>Touch CS (T_CS)</td>
+            <td><span class="pin-code">D8 (GPIO15)</span></td>
+            <td>فعال‌ساز تراشه لمسی XPT2046</td>
+          </tr>
+          <tr>
+            <td><strong>فرستنده (NodeMCU)</strong></td>
+            <td>NRF24 CE / CSN</td>
+            <td><span class="pin-code">D0 / D4</span></td>
+            <td>خطوط کنترل اختصاصی رادیو NRF24L01</td>
+          </tr>
+          <tr>
+            <td><strong>فرستنده (NodeMCU)</strong></td>
+            <td>SPI SCK / MISO / MOSI</td>
+            <td><span class="pin-code">D5 / D6 / D7</span></td>
+            <td>گذرگاه مشترک سخت‌افزاری HSPI</td>
+          </tr>
+          <tr>
+            <td><strong>گیرنده (Pro Mini)</strong></td>
+            <td>TFT RST / DC / CS</td>
+            <td><span class="pin-code">D8 / D9 / D10</span></td>
+            <td>پین‌های ۶، ۷ و ۱۲ فلت ۱۴ پین نمایشگر ۱.۴۴ اینچ</td>
+          </tr>
+          <tr>
+            <td><strong>گیرنده (Pro Mini)</strong></td>
+            <td>NRF24 CE / CSN</td>
+            <td><span class="pin-code">D5 / D7</span></td>
+            <td>خطوط کنترل رادیو NRF24 گیرنده</td>
+          </tr>
+          <tr>
+            <td><strong>گیرنده (Pro Mini)</strong></td>
+            <td>SPI SCK / MOSI / MISO</td>
+            <td><span class="pin-code">D13 / D11 / D12</span></td>
+            <td>گذرگاه مشترک سخت‌افزاری SPI</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Code Viewer -->
+    <h2 class="section-title">
+      <i class="fa-solid fa-code"></i>
+      <span>سورس کدهای کامل پروژه</span>
+    </h2>
+
+    <div class="code-container">
+      <div class="code-tabs">
+        <button class="code-tab-btn active" onclick="switchCodeTab(0)">PacketProtocol.h</button>
+        <button class="code-tab-btn" onclick="switchCodeTab(1)">Sender_NodeMCU_Gamepad.ino</button>
+        <button class="code-tab-btn" onclick="switchCodeTab(2)">Receiver_ProMini_Display.ino</button>
+      </div>
+      <pre><code id="codeViewerBox">// سورس کد در فایل‌های اختصاصی ذخیره شده است.</code></pre>
+    </div>
+
+    <footer>
+      <p>سیستم کنترل بی‌سیم دوربرد دسته بازی پلی‌استیشن و گیرنده تله‌متری - ۲۰۲۶</p>
+    </footer>
+
+  </div>
+
+  <script>
+    // Theme Switcher
+    const themeToggle = document.getElementById('themeToggle');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const savedTheme = localStorage.getItem('theme') || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeToggle.innerHTML = savedTheme === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+
+    themeToggle.addEventListener('click', () => {
+      const current = document.documentElement.getAttribute('data-theme');
+      const next = current === 'dark' ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      themeToggle.innerHTML = next === 'dark' ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+    });
+
+    // Dual Simulator Engine
+    const sCanvas = document.getElementById('senderCanvas');
+    const sCtx = sCanvas.getContext('2d');
+    const rCanvas = document.getElementById('receiverCanvas');
+    const rCtx = rCanvas.getContext('2d');
+
+    let simActiveMask = 0;
+    let simSeq = 0;
+    let simPackets = 0;
+    let simLinkConnected = true;
+    let simTxPulse = false;
+
+    const BTN_UP = 1, BTN_DOWN = 2, BTN_LEFT = 4, BTN_RIGHT = 8;
+    const BTN_TRI = 16, BTN_CIR = 32, BTN_CRO = 64, BTN_SQR = 128;
+    const BTN_L1 = 256, BTN_R1 = 512, BTN_SEL = 1024, BTN_STA = 2048;
+
+    const simButtons = [
+      { x: 62, y: 75, w: 42, h: 42, mask: BTN_UP, label: "^", color: "#fff" },
+      { x: 62, y: 169, w: 42, h: 42, mask: BTN_DOWN, label: "v", color: "#fff" },
+      { x: 15, y: 122, w: 42, h: 42, mask: BTN_LEFT, label: "<", color: "#fff" },
+      { x: 109, y: 122, w: 42, h: 42, mask: BTN_RIGHT, label: ">", color: "#fff" },
+      { x: 216, y: 75, w: 42, h: 42, mask: BTN_TRI, label: "/\\", color: "#22c55e" },
+      { x: 263, y: 122, w: 42, h: 42, mask: BTN_CIR, label: "O", color: "#ef4444" },
+      { x: 216, y: 169, w: 42, h: 42, mask: BTN_CRO, label: "X", color: "#38bdf8" },
+      { x: 169, y: 122, w: 42, h: 42, mask: BTN_SQR, label: "[]", color: "#ec4899" },
+      { x: 15, y: 35, w: 65, h: 28, mask: BTN_L1, label: "L1", color: "#fff" },
+      { x: 240, y: 35, w: 65, h: 28, mask: BTN_R1, label: "R1", color: "#fff" },
+      { x: 95, y: 35, w: 58, h: 28, mask: BTN_SEL, label: "SELECT", color: "#94a3b8" },
+      { x: 167, y: 35, w: 58, h: 28, mask: BTN_STA, label: "START", color: "#94a3b8" }
+    ];
+
+    function renderSender() {
+      sCtx.fillStyle = "#081026";
+      sCtx.fillRect(0, 0, 320, 240);
+
+      // Header
+      sCtx.fillStyle = "#162846";
+      sCtx.fillRect(0, 0, 320, 28);
+      sCtx.strokeStyle = "#334155";
+      sCtx.beginPath(); sCtx.moveTo(0, 28); sCtx.lineTo(320, 28); sCtx.stroke();
+
+      sCtx.fillStyle = "#ffffff";
+      sCtx.font = "10px 'JetBrains Mono', monospace";
+      sCtx.fillText("PS-CONTROLLER TX", 8, 18);
+      sCtx.fillStyle = "#94a3b8";
+      sCtx.fillText("CH:115", 130, 18);
+
+      // TX Pulse
+      sCtx.fillStyle = simTxPulse ? "#facc15" : "#475569";
+      sCtx.beginPath(); sCtx.arc(205, 14, 5, 0, Math.PI*2); sCtx.fill();
+
+      // Status
+      sCtx.fillStyle = simLinkConnected ? "#10b981" : "#ef4444";
+      sCtx.fillRect(218, 6, 94, 16);
+      sCtx.fillStyle = "#fff";
+      sCtx.fillText(simLinkConnected ? "LINK: ONLINE" : "LINK: OFFLINE", 226, 18);
+
+      // Buttons
+      simButtons.forEach(b => {
+        const pressed = (simActiveMask & b.mask) !== 0;
+        sCtx.fillStyle = pressed ? "#0284c7" : "#212534";
+        sCtx.strokeStyle = pressed ? "#ffffff" : "#475569";
+        sCtx.beginPath();
+        sCtx.roundRect(b.x, b.y, b.w, b.h, 6);
+        sCtx.fill();
+        sCtx.stroke();
+
+        sCtx.fillStyle = b.color;
+        sCtx.font = (b.mask >= BTN_SEL) ? "9px 'JetBrains Mono'" : "14px 'JetBrains Mono'";
+        sCtx.textAlign = "center";
+        sCtx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 + 5);
+        sCtx.textAlign = "start";
+      });
+    }
+
+    function renderReceiver() {
+      rCtx.fillStyle = "#081026";
+      rCtx.fillRect(0, 0, 128, 128);
+
+      // Header
+      rCtx.fillStyle = "#162846";
+      rCtx.fillRect(0, 0, 128, 16);
+      rCtx.fillStyle = "#fff";
+      rCtx.font = "8px 'JetBrains Mono'";
+      rCtx.fillText("PS RX", 4, 11);
+
+      // Status
+      rCtx.fillStyle = simLinkConnected ? "#10b981" : "#ef4444";
+      rCtx.fillRect(52, 3, 72, 10);
+      rCtx.fillStyle = "#fff";
+      rCtx.fillText(simLinkConnected ? "LINK: OK" : "NO LINK", 62, 11);
+
+      // Gamepad body
+      rCtx.fillStyle = "#1a233a";
+      rCtx.strokeStyle = "#475569";
+      rCtx.beginPath(); rCtx.roundRect(14, 26, 100, 52, 10); rCtx.fill(); rCtx.stroke();
+
+      // D-Pad
+      const m = simLinkConnected ? simActiveMask : 0;
+      rCtx.fillStyle = (m & BTN_UP) ? "#38bdf8" : "#081026";
+      rCtx.fillRect(31, 32, 7, 7);
+      rCtx.fillStyle = (m & BTN_DOWN) ? "#38bdf8" : "#081026";
+      rCtx.fillRect(31, 54, 7, 7);
+      rCtx.fillStyle = (m & BTN_LEFT) ? "#38bdf8" : "#081026";
+      rCtx.fillRect(20, 43, 7, 7);
+      rCtx.fillStyle = (m & BTN_RIGHT) ? "#38bdf8" : "#081026";
+      rCtx.fillRect(42, 43, 7, 7);
+
+      // Action buttons
+      rCtx.fillStyle = (m & BTN_TRI) ? "#22c55e" : "#081026";
+      rCtx.fillRect(91, 32, 7, 7);
+      rCtx.fillStyle = (m & BTN_CRO) ? "#38bdf8" : "#081026";
+      rCtx.fillRect(91, 54, 7, 7);
+      rCtx.fillStyle = (m & BTN_SQR) ? "#ec4899" : "#081026";
+      rCtx.fillRect(80, 43, 7, 7);
+      rCtx.fillStyle = (m & BTN_CIR) ? "#ef4444" : "#081026";
+      rCtx.fillRect(102, 43, 7, 7);
+
+      // Shoulders L1 / R1
+      rCtx.fillStyle = (m & BTN_L1) ? "#fff" : "#475569";
+      rCtx.fillRect(20, 22, 20, 3);
+      rCtx.fillStyle = (m & BTN_R1) ? "#fff" : "#475569";
+      rCtx.fillRect(88, 22, 20, 3);
+
+      // Bottom Telemetry
+      rCtx.strokeStyle = "#334155";
+      rCtx.beginPath(); rCtx.moveTo(0, 84); rCtx.lineTo(128, 84); rCtx.stroke();
+
+      rCtx.fillStyle = "#94a3b8";
+      rCtx.font = "7px 'JetBrains Mono'";
+      rCtx.fillText(`PKT: ${simPackets}`, 4, 96);
+      rCtx.fillText(`CH115 | 2.515GHz`, 4, 108);
+
+      let keyStr = "";
+      if (m & BTN_UP) keyStr += "^ ";
+      if (m & BTN_DOWN) keyStr += "v ";
+      if (m & BTN_LEFT) keyStr += "< ";
+      if (m & BTN_RIGHT) keyStr += "> ";
+      if (m & BTN_TRI) keyStr += "T ";
+      if (m & BTN_CRO) keyStr += "X ";
+      if (m & BTN_CIR) keyStr += "O ";
+      if (m & BTN_SQR) keyStr += "Sq ";
+      if (m & BTN_L1) keyStr += "L1 ";
+      if (m & BTN_R1) keyStr += "R1 ";
+      rCtx.fillStyle = "#22c55e";
+      rCtx.fillText(keyStr || "[IDLE]", 4, 120);
+    }
+
+    sCanvas.addEventListener('pointerdown', (e) => {
+      const rect = sCanvas.getBoundingClientRect();
+      const scaleX = 320 / rect.width;
+      const scaleY = 240 / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
+
+      simButtons.forEach(b => {
+        if (x >= b.x && x <= b.x + b.w && y >= b.y && y <= b.y + b.h) {
+          simActiveMask |= b.mask;
+        }
+      });
+      triggerTx();
+    });
+
+    window.addEventListener('pointerup', () => {
+      simActiveMask = 0;
+      triggerTx();
+    });
+
+    function triggerTx() {
+      simTxPulse = true;
+      if (simLinkConnected) {
+        simPackets++;
+      }
+      renderSender();
+      renderReceiver();
+      setTimeout(() => { simTxPulse = false; renderSender(); }, 80);
+    }
+
+    function toggleSimLink() {
+      simLinkConnected = !simLinkConnected;
+      document.getElementById('cutLinkText').innerText = simLinkConnected ? "قطع موقت سیگنال رادیویی" : "وصل مجدد سیگنال رادیویی";
+      renderSender();
+      renderReceiver();
+    }
+
+    // Code snippets
+    const codeFiles = [
+      `// PacketProtocol.h\n#define RF_CHANNEL_NUM 115\nconst uint8_t RF_PIPE_ADDRESS[5] = {'P', 'S', 'G', '0', '1'};\nstruct GamepadPacket {\n  uint8_t magic1; // 0xA5\n  uint8_t magic2; // 0x5A\n  uint16_t networkId; // 0xC0DE\n  uint8_t sequence;\n  uint16_t buttons;\n  uint8_t crc8;\n};`,
+      `// Sender_NodeMCU_Gamepad.ino\n// کامل در فایل Sender_NodeMCU_Gamepad.ino موجود است.`,
+      `// Receiver_ProMini_Display.ino\n// کامل در فایل Receiver_ProMini_Display.ino موجود است.`
+    ];
+
+    function switchCodeTab(idx) {
+      document.querySelectorAll('.code-tab-btn').forEach((b, i) => {
+        b.classList.toggle('active', i === idx);
+      });
+      document.getElementById('codeViewerBox').innerText = codeFiles[idx];
+    }
+    switchCodeTab(0);
+
+    renderSender();
+    renderReceiver();
+  </script>
+</body>
+</html>

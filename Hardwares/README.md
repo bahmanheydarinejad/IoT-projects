@@ -1137,6 +1137,7 @@
 - `nRF24L01.h`
 
 ### 🌐 پیوندهای مرجع و دیتاشیت
+- 🧪 **دستور کار آزمایشگاهی و تست:** [مشاهده دستور کار تعاملی دسته بازی پلی‌استیشن و گیرنده بی‌سیم (index.html)](./tests/NodeMCU_ESP8266_TFT2.8_Touch_ArduinoPro-mini_TFTST7735_NRF2401-pa-lna/index.html)
 - 📄 **دیتاشیت / مستندات سازنده:** [Nordic nRF24L01+ with PA & LNA Datasheet](https://www.sparkfun.com/datasheets/Components/SMD/nRF24L01Pluss_Preliminary_Product_Specification_v1_0.pdf)
 - 🛒 **صفحه خرید محصول (Cafe Robot):** [ماژول NRF24L01+PA+LNA - فرستنده و گيرنده راديويي با برد 1 کیلومتر](https://thecaferobot.com/store/nrf24l01-pa-lna-wireless-module)
 
