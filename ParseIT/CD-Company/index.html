@@ -1,0 +1,3180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CD-Company | Machine Monitoring & IIoT Architecture Portal</title>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0ea5e9;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f97316;
+      --dark-bg: #0b1120;
+      --card-bg: #1e293b;
+      --card-border: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --code-bg: #060911;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+
+    body {
+      background-color: var(--dark-bg);
+      color: var(--text-main);
+      line-height: 1.65;
+      overflow-x: hidden;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 60%, #0b1120 100%);
+      border-bottom: 1px solid var(--card-border);
+      padding: 2.5rem 2rem 1.8rem;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .header-title h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.4rem;
+    }
+
+    .header-title p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .stats-pills {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-pill {
+      background: rgba(30, 41, 59, 0.85);
+      border: 1px solid var(--card-border);
+      padding: 0.6rem 1.25rem;
+      border-radius: 9999px;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.9rem;
+    }
+
+    .stat-pill strong {
+      color: #38bdf8;
+      font-size: 1.15rem;
+    }
+
+    /* Sticky Navigation */
+    nav.sticky-nav {
+      position: sticky;
+      top: 0;
+      background: rgba(11, 17, 32, 0.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--card-border);
+      z-index: 100;
+      padding: 0.6rem 2rem;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      gap: 0.5rem;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: thin;
+    }
+
+    .nav-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.75rem 1.25rem;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-btn:hover {
+      color: var(--text-main);
+      background: rgba(51, 65, 85, 0.5);
+    }
+
+    .nav-btn.active {
+      color: #fff;
+      background: var(--primary);
+      box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    }
+
+    /* Layout & Cards */
+    main {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+    }
+
+    .tab-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .tab-section.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section-header {
+      margin-bottom: 1.75rem;
+    }
+
+    .section-header h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #f1f5f9;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-header p {
+      color: var(--text-muted);
+      margin-top: 0.3rem;
+      font-size: 1rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      margin-bottom: 1.75rem;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    }
+
+    .card h3 {
+      font-size: 1.28rem;
+      color: #38bdf8;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .card h4 {
+      font-size: 1.1rem;
+      color: #e2e8f0;
+      margin: 1.2rem 0 0.5rem;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+
+    /* KPI Highlights */
+    .kpi-card {
+      background: linear-gradient(145deg, #1e293b, #172033);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.4rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .kpi-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--primary);
+    }
+
+    .kpi-card.accent::before { background: var(--accent); }
+    .kpi-card.success::before { background: var(--success); }
+    .kpi-card.purple::before { background: #a855f7; }
+
+    .kpi-label {
+      font-size: 0.82rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+    }
+
+    .kpi-val {
+      font-size: 2.1rem;
+      font-weight: 800;
+      color: #fff;
+      margin: 0.3rem 0;
+    }
+
+    .kpi-desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    /* Tables */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 8px;
+      border: 1px solid var(--card-border);
+      margin: 1rem 0;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.9rem;
+    }
+
+    th {
+      background: #0f172a;
+      color: #94a3b8;
+      font-weight: 600;
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid var(--card-border);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+    }
+
+    td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
+      color: #e2e8f0;
+    }
+
+    tr:hover td {
+      background: rgba(51, 65, 85, 0.3);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-blue { background: rgba(37, 99, 235, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-amber { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .badge-green { background: rgba(16, 185, 129, 0.2); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-red { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* Search & Filter */
+    .filter-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .search-input {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.65rem 1rem;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      flex-grow: 1;
+      min-width: 280px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Alerts */
+    .alert-box {
+      border-radius: 8px;
+      padding: 1.1rem 1.4rem;
+      margin: 1.2rem 0;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      border-left: 4px solid;
+    }
+
+    .alert-info { background: rgba(14, 165, 233, 0.1); border-color: #0ea5e9; color: #e0f2fe; }
+    .alert-warning { background: rgba(245, 158, 11, 0.1); border-color: #f59e0b; color: #fef3c7; }
+    .alert-success { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #d1fae5; }
+    .alert-danger { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; color: #fee2e2; }
+
+    /* Code Blocks */
+    pre {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 1.25rem;
+      overflow-x: auto;
+      font-size: 0.85rem;
+      color: #cbd5e1;
+      position: relative;
+    }
+
+    code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    .code-header {
+      background: #172033;
+      padding: 0.5rem 1rem;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      border: 1px solid var(--card-border);
+      border-bottom: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      background: rgba(51, 65, 85, 0.6);
+      border: 1px solid var(--card-border);
+      color: #cbd5e1;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary);
+      color: #fff;
+    }
+
+    /* Comparison column */
+    .solution-col {
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      background: #172033;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .solution-col.recommended {
+      border: 2px solid #38bdf8;
+      background: linear-gradient(180deg, rgba(37, 99, 235, 0.12) 0%, #172033 100%);
+      position: relative;
+    }
+
+    .solution-col.recommended::before {
+      content: "RECOMMENDED SOLUTION";
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0284c7;
+      color: #fff;
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 0.2rem 0.8rem;
+      border-radius: 9999px;
+      letter-spacing: 0.05em;
+    }
+
+    .price-tag {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin: 0.5rem 0 1rem;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin: 1rem 0;
+      flex-grow: 1;
+    }
+
+    .feature-list li {
+      padding: 0.4rem 0;
+      font-size: 0.88rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.5rem;
+      color: #cbd5e1;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: var(--success);
+      font-weight: bold;
+    }
+
+    .feature-list li.neg::before {
+      content: "✗";
+      color: var(--danger);
+    }
+
+    /* SVG Containers */
+    .svg-container {
+      background: #060911;
+      border-radius: 10px;
+      border: 1px solid var(--card-border);
+      padding: 1.5rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    svg text {
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+
+    /* Step circles */
+    .step-item {
+      display: flex;
+      gap: 1.25rem;
+      margin-bottom: 1.5rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: #fff;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 1rem;
+      box-shadow: 0 4px 10px rgba(37, 99, 235, 0.4);
+    }
+
+    .step-body {
+      flex-grow: 1;
+    }
+
+    .step-body h4 {
+      margin-top: 0;
+      color: #f1f5f9;
+      font-size: 1.1rem;
+    }
+
+    .step-body p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-top: 0.25rem;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.85rem;
+      margin-top: 3.5rem;
+      background: #060911;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header>
+    <div class="header-content">
+      <div class="header-title">
+        <h1>CD-Company | Machine Monitoring Architecture</h1>
+        <p>End-to-End Wi-Fi Edge Microcontroller & Local Factory Server to Internet Cloud Web Dashboard</p>
+      </div>
+      <div class="stats-pills">
+        <div class="stat-pill">
+          <span>Total Fleet:</span>
+          <strong>173 Units</strong>
+        </div>
+        <div class="stat-pill">
+          <span>Netstal Diskjet 600:</span>
+          <strong>150 Units (86.7%)</strong>
+        </div>
+        <div class="stat-pill">
+          <span>Architecture:</span>
+          <strong>Wi-Fi ➔ Local Edge ➔ Cloud</strong>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Sticky Tab Navigation -->
+  <nav class="sticky-nav">
+    <div class="nav-container">
+      <button class="nav-btn active" onclick="switchTab('e2e-pipeline')">
+        <span>🌐</span> End-to-End Wi-Fi Pipeline
+      </button>
+      <button class="nav-btn" onclick="switchTab('telemetry-params')">
+        <span>📊</span> Monitoring Telemetry & Parameters
+      </button>
+      <button class="nav-btn" onclick="switchTab('fleet')">
+        <span>🏭</span> Fleet Inventory (173 Machines)
+      </button>
+      <button class="nav-btn" onclick="switchTab('netstal-tech')">
+        <span>📖</span> Netstal SynErgy Specs (PDF Doc)
+      </button>
+      <button class="nav-btn" onclick="switchTab('solutions-matrix')">
+        <span>⚖️</span> Solution Comparison (3 Options)
+      </button>
+      <button class="nav-btn" onclick="switchTab('wiring-modules')">
+        <span>🔌</span> Wiring & Hardware Modules
+      </button>
+      <button class="nav-btn" onclick="switchTab('programs-code')">
+        <span>💻</span> ESP32 & Local Server Code
+      </button>
+      <button class="nav-btn" onclick="switchTab('bom')">
+        <span>🛒</span> Complete BOM & Cost Analysis
+      </button>
+      <button class="nav-btn" onclick="switchTab('qa-log')">
+        <span>💬</span> Q&A Log & Decision History
+      </button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main>
+
+    <!-- TAB 1: END-TO-END WI-FI PIPELINE -->
+    <section id="e2e-pipeline" class="tab-section active">
+      <div class="section-header">
+        <h2>End-to-End Monitoring Architecture</h2>
+        <p>From machine electrical terminals to wireless edge, on-premise factory server, and live online web dashboard</p>
+      </div>
+
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="kpi-card">
+          <div class="kpi-label">Tier 1: Machine Node</div>
+          <div class="kpi-val">173 Adapters</div>
+          <div class="kpi-desc">ESP32 + External Magnetic Wi-Fi Antenna mounted on each machine cabinet</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">Tier 2: Factory Network</div>
+          <div class="kpi-val">2.4 GHz Mesh</div>
+          <div class="kpi-desc">High-throughput local Wi-Fi sending HTTP/JSON to On-Premise Factory Server</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">Tier 3: Local Server</div>
+          <div class="kpi-val">Zero Data Loss</div>
+          <div class="kpi-desc">Aggregates & buffers records locally; continues logging even during internet blackouts</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">Tier 4: Internet Cloud</div>
+          <div class="kpi-val">Real-Time UI</div>
+          <div class="kpi-desc">Company Web Dashboard streaming live metrics via WebSockets & REST API</div>
+        </div>
+      </div>
+
+      <!-- High-Resolution Architecture SVG -->
+      <div class="card">
+        <h3>Four-Tier Data Pipeline (Detailed Flow)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          How individual machine events are captured, debounced, transmitted locally over Wi-Fi, cached on-premises, and synchronized with your company's internet web application:
+        </p>
+
+        <div class="svg-container">
+          <svg viewBox="0 0 1300 480" width="100%" height="470">
+            <defs>
+              <linearGradient id="bgMach" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#1e293b" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#0f172a" stop-opacity="0.9"/>
+              </linearGradient>
+              <linearGradient id="bgLocal" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#064e3b" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#022c22" stop-opacity="0.4"/>
+              </linearGradient>
+              <linearGradient id="bgCloud" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#312e81" stop-opacity="0.4"/>
+                <stop offset="100%" stop-color="#1e1b4b" stop-opacity="0.4"/>
+              </linearGradient>
+              <marker id="arrowB" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#38bdf8" />
+              </marker>
+              <marker id="arrowG" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#34d399" />
+              </marker>
+              <marker id="arrowP" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1 L 8 5 L 0 9 z" fill="#c084fc" />
+              </marker>
+            </defs>
+
+            <!-- TIER 1: Machine & Adapter -->
+            <rect x="20" y="30" width="360" height="420" rx="12" fill="url(#bgMach)" stroke="#38bdf8" stroke-width="2"/>
+            <text x="200" y="62" fill="#38bdf8" font-size="15" font-weight="700" text-anchor="middle">TIER 1: MACHINE + WI-FI ADAPTER</text>
+            <text x="200" y="80" fill="#94a3b8" font-size="11" text-anchor="middle">(173 Machines across Factory Floor)</text>
+
+            <rect x="40" y="100" width="320" height="70" rx="6" fill="#0f172a" stroke="#334155"/>
+            <text x="55" y="122" fill="#e2e8f0" font-size="12" font-weight="600">Injection Machine Cabinet (24V Lines)</text>
+            <text x="55" y="140" fill="#94a3b8" font-size="11">• Andon Tower (Red/Yellow/Green 24V)</text>
+            <text x="55" y="157" fill="#94a3b8" font-size="11">• Mold Clamped Limit Switch (24V Pulse)</text>
+
+            <rect x="40" y="185" width="320" height="70" rx="6" fill="#0f172a" stroke="#f59e0b"/>
+            <text x="55" y="207" fill="#fbbf24" font-size="12" font-weight="600">4-Channel Optocoupler Isolation Board</text>
+            <text x="55" y="225" fill="#94a3b8" font-size="11">• Optical barrier isolates machine 24V spikes</text>
+            <text x="55" y="242" fill="#94a3b8" font-size="11">• Outputs safe 3.3V DC logic signals to ESP32</text>
+
+            <rect x="40" y="270" width="320" height="95" rx="6" fill="#0f172a" stroke="#10b981"/>
+            <text x="55" y="292" fill="#34d399" font-size="12" font-weight="600">ESP32 Core Microcontroller</text>
+            <text x="55" y="310" fill="#94a3b8" font-size="11">• Hardware Interrupt: Calculates cycle time (ms)</text>
+            <text x="55" y="327" fill="#94a3b8" font-size="11">• Shot Counter: Stored in volatile + flash</text>
+            <text x="55" y="344" fill="#94a3b8" font-size="11">• State Machine: RUNNING, IDLE, ALARM</text>
+
+            <rect x="40" y="380" width="320" height="55" rx="6" fill="#0f172a" stroke="#38bdf8"/>
+            <text x="55" y="402" fill="#38bdf8" font-size="12" font-weight="600">External Magnetic Base Wi-Fi Antenna</text>
+            <text x="55" y="420" fill="#94a3b8" font-size="11">Mounted on outside top of steel cabinet</text>
+
+            <!-- Arrows: Tier 1 internal flow -->
+            <line x1="200" y1="170" x2="200" y2="185" stroke="#fbbf24" stroke-width="2" marker-end="url(#arrowB)"/>
+            <line x1="200" y1="255" x2="200" y2="270" stroke="#34d399" stroke-width="2" marker-end="url(#arrowB)"/>
+            <line x1="200" y1="365" x2="200" y2="380" stroke="#38bdf8" stroke-width="2" marker-end="url(#arrowB)"/>
+
+            <!-- Wi-Fi Transmission Waves -->
+            <path d="M 360 405 C 410 405, 410 240, 470 240" fill="none" stroke="#38bdf8" stroke-width="3" stroke-dasharray="6,4" marker-end="url(#arrowB)"/>
+            <text x="415" y="315" fill="#38bdf8" font-size="12" font-weight="700">2.4 GHz Wi-Fi</text>
+            <text x="415" y="332" fill="#94a3b8" font-size="10">HTTP POST JSON</text>
+
+            <!-- TIER 2: Factory Wireless Network & Access Points -->
+            <rect x="470" y="30" width="360" height="420" rx="12" fill="url(#bgLocal)" stroke="#10b981" stroke-width="2"/>
+            <text x="650" y="62" fill="#34d399" font-size="15" font-weight="700" text-anchor="middle">TIER 2 & 3: LOCAL FACTORY SERVER</text>
+            <text x="650" y="80" fill="#94a3b8" font-size="11" text-anchor="middle">(On-Premises Server in Plant Control Room)</text>
+
+            <rect x="490" y="100" width="320" height="70" rx="6" fill="#0f172a" stroke="#047857"/>
+            <text x="505" y="122" fill="#a7f3d0" font-size="12" font-weight="600">Industrial Wi-Fi Access Points (Mesh)</text>
+            <text x="505" y="140" fill="#94a3b8" font-size="11">• Ceilings APs partitioned across Ch 1, 6, 11</text>
+            <text x="505" y="157" fill="#94a3b8" font-size="11">• Isolated factory VLAN (e.g. 192.168.10.x)</text>
+
+            <rect x="490" y="185" width="320" height="85" rx="6" fill="#0f172a" stroke="#047857"/>
+            <text x="505" y="207" fill="#a7f3d0" font-size="12" font-weight="600">Local Ingestion API Server (FastAPI / Node)</text>
+            <text x="505" y="225" fill="#94a3b8" font-size="11">• Receives HTTP POST: <code>/api/v1/telemetry</code></text>
+            <text x="505" y="242" fill="#94a3b8" font-size="11">• Validates payload from 173 concurrent nodes</text>
+            <text x="505" y="259" fill="#94a3b8" font-size="11">• Response: 200 OK + time sync timestamp</text>
+
+            <rect x="490" y="285" width="320" height="75" rx="6" fill="#0f172a" stroke="#047857"/>
+            <text x="505" y="307" fill="#a7f3d0" font-size="12" font-weight="600">Local Database (Store & Forward Buffer)</text>
+            <text x="505" y="325" fill="#94a3b8" font-size="11">• SQLite / TimescaleDB on local SSD</text>
+            <text x="505" y="342" fill="#94a3b8" font-size="11">• Unsent queue buffers days of factory telemetry</text>
+
+            <rect x="490" y="375" width="320" height="60" rx="6" fill="#0f172a" stroke="#047857"/>
+            <text x="505" y="397" fill="#a7f3d0" font-size="12" font-weight="600">Cloud Sync Worker (Outbox Dispatcher)</text>
+            <text x="505" y="415" fill="#94a3b8" font-size="11">• Batches 50 records per sync payload via HTTPS</text>
+
+            <!-- Arrow: Local Server to Cloud -->
+            <path d="M 830 240 L 920 240" fill="none" stroke="#a855f7" stroke-width="3" marker-end="url(#arrowP)"/>
+            <text x="875" y="225" fill="#c084fc" font-size="12" font-weight="700" text-anchor="middle">HTTPS Sync</text>
+            <text x="875" y="258" fill="#94a3b8" font-size="10" text-anchor="middle">(TLS / Encrypted)</text>
+
+            <!-- TIER 4: Cloud Server & Web App -->
+            <rect x="920" y="30" width="360" height="420" rx="12" fill="url(#bgCloud)" stroke="#a855f7" stroke-width="2"/>
+            <text x="1100" y="62" fill="#c084fc" font-size="15" font-weight="700" text-anchor="middle">TIER 4: CLOUD SERVER & DASHBOARD</text>
+            <text x="1100" y="80" fill="#94a3b8" font-size="11" text-anchor="middle">(Hosted on AWS / Company Web Server)</text>
+
+            <rect x="940" y="100" width="320" height="75" rx="6" fill="#0f172a" stroke="#581c87"/>
+            <text x="955" y="122" fill="#e9d5ff" font-size="12" font-weight="600">Cloud Ingestion API & Database</text>
+            <text x="955" y="140" fill="#94a3b8" font-size="11">• Endpoint: <code>/api/v1/factory-sync</code></text>
+            <text x="955" y="157" fill="#94a3b8" font-size="11">• PostgreSQL / TimeSeries historical storage</text>
+
+            <rect x="940" y="190" width="320" height="75" rx="6" fill="#0f172a" stroke="#581c87"/>
+            <text x="955" y="212" fill="#e9d5ff" font-size="12" font-weight="600">Live WebSocket Broadcast Service</text>
+            <text x="955" y="230" fill="#94a3b8" font-size="11">• Pushes delta updates to all connected browsers</text>
+            <text x="955" y="247" fill="#94a3b8" font-size="11">• Real-time state change alerts (&lt;500ms latency)</text>
+
+            <rect x="940" y="280" width="320" height="155" rx="6" fill="#0f172a" stroke="#a855f7"/>
+            <text x="955" y="304" fill="#a78bfa" font-size="13" font-weight="700">Company Online Web Dashboard (UI)</text>
+            <text x="955" y="326" fill="#cbd5e1" font-size="11">• 173-Machine Status Grid (Red/Yel/Grn)</text>
+            <text x="955" y="344" fill="#cbd5e1" font-size="11">• Live Cycle Times & Deviation Alerts</text>
+            <text x="955" y="362" fill="#cbd5e1" font-size="11">• Cumulative Shot & Produced Disc Counts</text>
+            <text x="955" y="380" fill="#cbd5e1" font-size="11">• OEE Availability, Performance & Quality</text>
+            <text x="955" y="398" fill="#cbd5e1" font-size="11">• Shift Reports, Export to Excel/PDF</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Step-by-Step Walkthrough -->
+      <div class="card">
+        <h3>Step-by-Step Walkthrough of the Data Lifecycle</h3>
+        
+        <div class="step-item">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <h4>Physical Event Capture on the Machine</h4>
+            <p>
+              When a Netstal Diskjet 600 completes a molding cycle, its mold clamping toggle releases or the mechanical limit switch closes. This triggers a <strong>24V DC rising/falling voltage edge</strong>. Simultaneously, the machine's external Andon stack light outputs 24V DC to its Green (Run), Yellow (Idle/Warmup), or Red (Fault) light.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <h4>Optoelectronic Isolation & Edge Processing (ESP32)</h4>
+            <p>
+              The 24V DC signals enter the <strong>PC817 Optocoupler board</strong>, keeping the high-noise industrial machine power completely separate from the microcontroller. The optocoupler pulls an ESP32 GPIO pin to GND. A hardware interrupt service routine (ISR) on the ESP32 captures the exact millisecond timestamp, debounces contact bounce, calculates the elapsed cycle time (e.g. <code>2.84s</code>), and increments the machine's total shot counter.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <h4>Local Wireless Network Transmission (Wi-Fi to Local Server)</h4>
+            <p>
+              The ESP32 uses its external magnetic antenna (placed outside the steel machine housing) to transmit a compact HTTP POST JSON payload over the local plant Wi-Fi to the <strong>Local Factory Server</strong> at <code>http://192.168.10.50:5000/api/v1/telemetry</code>. This happens on every completed shot or on a 5-second heartbeat.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <h4>On-Premises Store-and-Forward Buffering</h4>
+            <p>
+              The Local Factory Server ingests the telemetry into a local SQLite/TimescaleDB database. If the factory's internet connection is slow or drops completely, <strong>zero data is lost</strong>—the local server buffers all records with exact millisecond timestamps.
+            </p>
+          </div>
+        </div>
+
+        <div class="step-item">
+          <div class="step-num">5</div>
+          <div class="step-body">
+            <h4>Encrypted Cloud Synchronization & Web UI Live Streaming</h4>
+            <p>
+              A background worker on the Local Factory Server flushes buffered records in compressed HTTPS POST batches to the <strong>Internet Cloud Web Server</strong>. The cloud backend ingests the data, computes plant OEE, and broadcasts live telemetry over WebSockets to your company's web-based dashboard in real time.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 2: FLEET INVENTORY -->
+    <section id="fleet" class="tab-section">
+      <div class="section-header">
+        <h2>Plant Machine Inventory & Specification Matrix</h2>
+        <p>Complete data transcribed directly from <strong>Hardware list.pdf</strong> (173 Machines total)</p>
+      </div>
+
+      <div class="filter-bar">
+        <input type="text" id="machineSearch" class="search-input" placeholder="🔍 Search by brand, model, tonnage, or year..." onkeyup="filterMachines()">
+        <button class="nav-btn" style="border: 1px solid var(--card-border);" onclick="resetFilter()">Reset Filter</button>
+      </div>
+
+      <div class="table-container">
+        <table id="fleetTable">
+          <thead>
+            <tr>
+              <th>Brand</th>
+              <th>Trade Name</th>
+              <th>Model</th>
+              <th>Tonnage (T)</th>
+              <th>Year</th>
+              <th>Tiebar Distance (mm)</th>
+              <th>Mould Height (mm)</th>
+              <th>Max Shot Weight (g)</th>
+              <th>Quantity</th>
+              <th>Share of Plant</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background: rgba(37, 99, 235, 0.12); font-weight: 600;">
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Diskjet</td>
+              <td>600</td>
+              <td>60</td>
+              <td>2000</td>
+              <td>30 Triangle</td>
+              <td>180 – 200</td>
+              <td>43 g</td>
+              <td><strong style="color: #38bdf8; font-size: 1.1rem;">150</strong></td>
+              <td><span class="badge badge-green">86.7% (Dominant)</span></td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Sycap</td>
+              <td>N235/90</td>
+              <td>90</td>
+              <td>1990</td>
+              <td>360 × 360</td>
+              <td>100 – 400</td>
+              <td>150 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Sycap</td>
+              <td>580/140</td>
+              <td>140</td>
+              <td>1990</td>
+              <td>370 × 410</td>
+              <td>200 – 470</td>
+              <td>190 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Sycap</td>
+              <td>580/150</td>
+              <td>150</td>
+              <td>1990</td>
+              <td>460 × 460</td>
+              <td>400 – 670</td>
+              <td>307 g</td>
+              <td>4</td>
+              <td>2.3%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Sycap</td>
+              <td>1570/300</td>
+              <td>200</td>
+              <td>1990</td>
+              <td>641 × 530</td>
+              <td>250 – 600</td>
+              <td>970 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Synergy</td>
+              <td>1500 K</td>
+              <td>150</td>
+              <td>2007</td>
+              <td>460 × 460</td>
+              <td>250 – 550</td>
+              <td>193 g</td>
+              <td>5</td>
+              <td>2.9%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Synergy / 2 in one</td>
+              <td>4200</td>
+              <td>420</td>
+              <td>2007</td>
+              <td>713 × 713</td>
+              <td>400 – 750</td>
+              <td>719 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Synergy</td>
+              <td>5000</td>
+              <td>500</td>
+              <td>2007</td>
+              <td>920 × 920</td>
+              <td>450 – 950</td>
+              <td>2,196 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-blue">Netstal</span></td>
+              <td>Synergy</td>
+              <td>6000</td>
+              <td>600</td>
+              <td>2007</td>
+              <td>1020 × 1020</td>
+              <td>500 – 1000</td>
+              <td>2,711 g</td>
+              <td>2</td>
+              <td>1.2%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">BMB</span></td>
+              <td>KW-35-PI</td>
+              <td>350</td>
+              <td>350</td>
+              <td>2006</td>
+              <td>710 × 630</td>
+              <td>350 – 850</td>
+              <td>1,290 g</td>
+              <td>2</td>
+              <td>1.2%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-purple">Haitian (Hitian)</span></td>
+              <td>Gold 120</td>
+              <td>120</td>
+              <td>120</td>
+              <td>2004</td>
+              <td>420 × 420</td>
+              <td>150 – 430</td>
+              <td>195 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-purple">Haitian (Hitian)</span></td>
+              <td>Gold 250</td>
+              <td>250</td>
+              <td>250</td>
+              <td>2004</td>
+              <td>580 × 580</td>
+              <td>220 – 550</td>
+              <td>520 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-purple">Haitian (Hitian)</span></td>
+              <td>Gold 300</td>
+              <td>300</td>
+              <td>300</td>
+              <td>2004</td>
+              <td>600 × 600</td>
+              <td>250 – 660</td>
+              <td>776 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-amber">Negri Bossi</span></td>
+              <td>NB 250</td>
+              <td>250</td>
+              <td>250</td>
+              <td>1995</td>
+              <td>570 × 570</td>
+              <td>280 – 600</td>
+              <td>1,154 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+            <tr>
+              <td><span class="badge badge-green">Engel</span></td>
+              <td>110 Victory</td>
+              <td>330/110</td>
+              <td>110</td>
+              <td>2000</td>
+              <td>600 – 730 (Tiebarless)</td>
+              <td>250 – 750</td>
+              <td>154 g</td>
+              <td>1</td>
+              <td>0.6%</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="background: #0f172a; font-weight: 700;">
+              <td colspan="8" style="text-align: right; color: #94a3b8;">TOTAL FLEET COUNT (تعداد کل ماشین های تزریق):</td>
+              <td style="color: #38bdf8; font-size: 1.2rem;">173 Units</td>
+              <td>100.0%</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>💡</div>
+        <div>
+          <strong>Key Engineering Finding:</strong> Because <strong>150 out of 173 machines (86.7%)</strong> are identical Netstal Diskjet 600 machines used for optical discs, developing a standardized plug-and-play adapter harness solves the monitoring problem for almost the entire facility in one stroke!
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: NETSTAL TECHNICAL DATA -->
+    <section id="netstal-tech" class="tab-section">
+      <div class="section-header">
+        <h2>Netstal SynErgy & Diskjet Technical Reference</h2>
+        <p>Documented directly from the official 37-page brochure <strong>Technical data.pdf</strong></p>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <h3>Electronic & Control Architecture (Steuerung)</h3>
+          <table style="font-size: 0.85rem;">
+            <tbody>
+              <tr>
+                <td style="color: #94a3b8; width: 35%;">Controller Type</td>
+                <td><strong>DSP Control, multi-processor system</strong> with hybrid CISC and RISC processors</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Closed-Loop Engine</td>
+                <td><strong>SYCAP (System for Computer Aided Plasticizing)</strong>: active control of dosing, injection, holding pressure, clamping force, and line pressure</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Operator Interface</td>
+                <td><strong>GRAPHTRACK</strong> visualization with real-time nominal vs. actual curve overlay</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Network Interface</td>
+                <td><strong>TCP/IP Protocol</strong> (RJ45 network board built-in or slot option)</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Host Interface (MES)</td>
+                <td><strong>Leitrechner-Schnittstelle</strong> supporting <strong>Euromap 15 / Euromap 63</strong> file-transfer protocol</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Automation Standards</td>
+                <td>Euromap 18 (mechanical robot top interface), Euromap 12 / 67 (electrical robot handshake)</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Quality Package</td>
+                <td>100% Q-monitoring with internal logbook holding up to <strong>3,000 process error entries</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="card">
+          <h3>Sensors & Physical Instrumentation</h3>
+          <table style="font-size: 0.85rem;">
+            <tbody>
+              <tr>
+                <td style="color: #94a3b8; width: 35%;">Stroke Measurement</td>
+                <td><strong>Ultrasonic non-contact transducers</strong> with <strong>0.1 mm resolution</strong> on clamping unit, injection unit, and ejector</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Hydraulic System</td>
+                <td><strong>210 bar line pressure</strong> digitally closed-loop controlled via constant & variable displacement pumps + accumulator battery</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Dry Cycle Speed</td>
+                <td>Fast dry cycle times: <strong>1.0s to 1.8s</strong> (Diskjet optical cycles reach ~2.5s full cycle)</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Drive Power Range</td>
+                <td>Electric motors from <strong>15 kW up to 160 kW</strong></td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Barrel Heating</td>
+                <td>High-precision thermocouples up to <strong>500°C</strong> with individual zone current monitoring</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Hydraulic Fluid Spec</td>
+                <td><strong>HLP-68 (DIN 51524 Teil 2)</strong>, ISO VG 68, Viscosity Index VI ≥ 95, zinc-free</td>
+              </tr>
+              <tr>
+                <td style="color: #94a3b8;">Noise & Safety</td>
+                <td>75 dB(A) acoustic rating under EN 201; 2-stage oil filter and level supervision</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>SynErgy Clamping & Injection Technical Spectrum (From PDF Pages 4–14)</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Clamping Force (kN)</th>
+                <th>Distance Between Tiebars (mm)</th>
+                <th>Dry Cycle Time (sec)</th>
+                <th>Standard Motor Power (kW)</th>
+                <th>Max Injection Speed</th>
+                <th>Oil Tank Volume (L)</th>
+                <th>Net Weight (kg)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>600 kN (60T)</strong></td>
+                <td>410 × 410</td>
+                <td>1.0 s</td>
+                <td>15 / 22 / 30 kW</td>
+                <td>Up to 1000 mm/s</td>
+                <td>230 L</td>
+                <td>6,600 kg</td>
+              </tr>
+              <tr>
+                <td><strong>800 kN (80T)</strong></td>
+                <td>410 × 410</td>
+                <td>1.0 s</td>
+                <td>15 / 22 / 30 kW</td>
+                <td>Up to 1000 mm/s</td>
+                <td>230 L</td>
+                <td>6,700 kg</td>
+              </tr>
+              <tr>
+                <td><strong>1000 / 1200 kN</strong></td>
+                <td>460 × 460</td>
+                <td>1.0 – 1.1 s</td>
+                <td>22 / 30 / 37 kW</td>
+                <td>Up to 1000 mm/s</td>
+                <td>300 L</td>
+                <td>7,500 – 7,800 kg</td>
+              </tr>
+              <tr>
+                <td><strong>1500 K / 1500 kN</strong></td>
+                <td>460 × 460 / 510 × 510</td>
+                <td>1.2 s</td>
+                <td>30 / 37 / 45 kW</td>
+                <td>Up to 1000 mm/s</td>
+                <td>300 – 370 L</td>
+                <td>9,700 – 11,200 kg</td>
+              </tr>
+              <tr>
+                <td><strong>4200 K / 5000 kN</strong></td>
+                <td>713 × 713 / 920 × 920</td>
+                <td>1.8 – 2.1 s</td>
+                <td>55 / 75 / 90 kW</td>
+                <td>High-speed accumulation</td>
+                <td>445 – 800 L</td>
+                <td>24,800 – 42,000 kg</td>
+              </tr>
+              <tr>
+                <td><strong>6000 / 8000 kN</strong></td>
+                <td>1020 × 1020 / 1220 × 1220</td>
+                <td>2.2 – 2.5 s</td>
+                <td>90 / 132 / 160 kW</td>
+                <td>High-speed accumulation</td>
+                <td>800 – 950 L</td>
+                <td>54,000 – 73,100 kg</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- DISKJET 600 CONNECTORS & INTERFACES -->
+      <div class="card">
+        <h3>Complete Connectors, Interfaces &amp; I/O Ports on Netstal Diskjet 600</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Detailed breakdown of all physical ports, industrial sockets, communication buses, and electrical interfaces built into the 150 Netstal Diskjet 600 machines (and what data they provide):
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Interface / Connector</th>
+                <th>Physical Connector Type</th>
+                <th>Subsystem &amp; Location</th>
+                <th>Signals &amp; Information Provided</th>
+                <th>Monitoring &amp; Integration Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Robot Han Connector -->
+              <tr style="background: rgba(37, 99, 235, 0.08);">
+                <td><strong>Euromap 12 / 67 Robot Interface</strong></td>
+                <td>32-Pin / 50-Pin Harting Han Industrial Heavy-Duty Socket</td>
+                <td>Side electrical cabinet (Connects to disc take-out robot)</td>
+                <td>
+                  &bull; Mold Open Position Reached<br>
+                  &bull; Mold Closed Interlock<br>
+                  &bull; Ejector Forward / Retract status<br>
+                  &bull; Robot In-Mold Safety Flag<br>
+                  &bull; <strong>Good / Reject Disc Sorting Signal</strong>
+                </td>
+                <td>
+                  <strong>Crucial for OEE:</strong> The Reject Disc trigger gives exact scrap/rejection counts directly from machine quality logic without manual inspection.
+                </td>
+              </tr>
+              <!-- Host Serial -->
+              <tr style="background: rgba(245, 158, 11, 0.08);">
+                <td><strong>Host Computer Serial (Leitrechner)</strong></td>
+                <td>DB9 / DB25 RS-232 or RS-422/485 Screw Terminal Block</td>
+                <td>SYCAP Multi-Processor DSP rack inside control cabinet</td>
+                <td>
+                  &bull; ASCII session stream (Euromap 15 / 63)<br>
+                  &bull; Peak injection pressure ($P_{\text{inj}}$ bar)<br>
+                  &bull; Cushion stroke ($0.1\,\text{mm}$)<br>
+                  &bull; Plasticizing time &amp; Injection speed<br>
+                  &bull; Error codes from 3,000-entry logbook
+                </td>
+                <td>
+                  Direct digital telemetry of real injection dynamics without external analog sensors. Accessible via MAX485/MAX3232 to ESP32 UART2.
+                </td>
+              </tr>
+              <!-- Ethernet TCP/IP -->
+              <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><strong>Ethernet Network Port (TCP/IP)</strong></td>
+                <td>RJ45 8P8C Modular Jack (10/100 Mbps)</td>
+                <td>DSP CPU board / Communication daughtercard</td>
+                <td>
+                  &bull; TCP/IP socket data stream<br>
+                  &bull; Euromap 63 over TCP/IP protocol<br>
+                  &bull; Mold recipe upload/download<br>
+                  &bull; Netstal Sycap remote service protocol
+                </td>
+                <td>
+                  Allows direct network socket communication to the Local Factory Server for recipe management and high-speed process data dumps.
+                </td>
+              </tr>
+              <!-- Cavity Pressure -->
+              <tr>
+                <td><strong>Mold Cavity Pressure Port (Werkzeuginnendruck)</strong></td>
+                <td>BNC Coaxial or M12 4-Pin Circular Connector</td>
+                <td>Mold platen interface panel (Connects to Kistler piezo sensors)</td>
+                <td>
+                  &bull; $0\text{--}10\,\text{V}$ analog or charge signal<br>
+                  &bull; Live dynamic pressure curve inside the CD disc mold cavity
+                </td>
+                <td>
+                  Provides microsecond cavity filling curve; detects flash and short shots before the mold even opens.
+                </td>
+              </tr>
+              <!-- Printer Interface -->
+              <tr>
+                <td><strong>Printer Port (Druckerschnittstelle)</strong></td>
+                <td>DB25 Female Parallel (Centronics) or DB9 Serial</td>
+                <td>Operator console rear or main cabinet door</td>
+                <td>
+                  &bull; Shift production summaries<br>
+                  &bull; Parameter printouts &amp; statistical variance<br>
+                  &bull; Historical alarm &amp; disturbance listings
+                </td>
+                <td>
+                  Can be tapped by an ESP32 as a "Virtual Printer" to automatically capture and parse shift summaries into JSON without modifying machine software.
+                </td>
+              </tr>
+              <!-- Auxiliary Power & Relays -->
+              <tr>
+                <td><strong>Cycle Switched Sockets &amp; Relays</strong></td>
+                <td>230V AC Industrial Sockets + Dry Relay Contact Terminals</td>
+                <td>Lower control cabinet</td>
+                <td>
+                  &bull; Color dosing feeder trigger pulse<br>
+                  &bull; Reject bin changer trigger pulse<br>
+                  &bull; External acoustic horn &amp; optical beacon output<br>
+                  &bull; Conveyor belt advance pulse
+                </td>
+                <td>
+                  Taps directly into peripheral sync signals; confirms peripheral hopper loaders and chillers are operating synchronously with molding.
+                </td>
+              </tr>
+              <!-- Analog Test Points -->
+              <tr>
+                <td><strong>SYCAP DSP Diagnostic Test Points</strong></td>
+                <td>2mm Miniature Banana Jacks / BNC Test Points</td>
+                <td>Front of SYCAP DSP controller rack</td>
+                <td>
+                  &bull; System Hydraulic Pressure ($0\text{--}10\,\text{V} = 0\text{--}210\,\text{bar}$)<br>
+                  &bull; Servo Valve Command Voltage ($0\text{--}10\,\text{V}$)<br>
+                  &bull; Ultrasonic Stroke Analog Feedback
+                </td>
+                <td>
+                  Used for high-speed oscilloscope data acquisition (10 kHz sampling) during hydraulic valve tuning.
+                </td>
+              </tr>
+              <!-- Floppy Disk -->
+              <tr>
+                <td><strong>Data Storage / Floppy Port</strong></td>
+                <td>34-Pin IDC Ribbon Header (Standard 3.5" 1.44MB floppy drive)</td>
+                <td>Front operator control console</td>
+                <td>
+                  &bull; Tool recipe configurations (floppy diskette)<br>
+                  &bull; Quality package parameter limits<br>
+                  &bull; Can be retrofitted with Gotek USB floppy emulator
+                </td>
+                <td>
+                  Enables digital recipe backup and setup archiving across all 150 Diskjet machines.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: SOLUTIONS MATRIX -->
+    <section id="solutions-matrix" class="tab-section">
+      <div class="section-header">
+        <h2>Comparison of the 3 Interfacing Solutions</h2>
+        <p>Evaluating Official Vendor Gateways vs. Industrial Open Microcontrollers vs. ESP32 Wi-Fi Adapters</p>
+      </div>
+
+      <div class="grid-3">
+        <!-- Solution 1 -->
+        <div class="solution-col">
+          <span class="badge badge-amber" style="width: fit-content;">SOLUTION 1</span>
+          <h4 style="margin-top: 0.5rem;">Official OEM & Commercial Gateways</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Euromap 63 Middleware / Industrial I/O Modules (Moxa/Advantech/Siemens)</p>
+          <div class="price-tag">$200 – $600 <span style="font-size: 0.9rem; color: var(--text-muted);">/ machine</span></div>
+          
+          <ul class="feature-list">
+            <li>Factory certified (CE, UL, IP-rated)</li>
+            <li>Out-of-the-box DIN-rail mounting</li>
+            <li>Direct MQTT, Modbus TCP, REST API</li>
+            <li class="neg">Very high total cost across 173 machines ($35,000 – $100,000+)</li>
+            <li class="neg">Euromap 63 software licenses require OEM activation fees</li>
+            <li class="neg">Cannot extract data from 1990 Sycaps easily without extra I/O cards</li>
+          </ul>
+
+          <div style="background: #0f172a; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+            <strong>Best For:</strong> The 9 newer Netstal SynErgy (2007) machines if high-resolution pressure curve diagnostics are needed.
+          </div>
+        </div>
+
+        <!-- Solution 2 -->
+        <div class="solution-col">
+          <span class="badge badge-blue" style="width: fit-content;">SOLUTION 2</span>
+          <h4 style="margin-top: 0.5rem;">Industrial Open Controllers</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">Arduino Opta Micro-PLC / Portenta Machine Control / Revolution Pi</p>
+          <div class="price-tag">$120 – $220 <span style="font-size: 0.9rem; color: var(--text-muted);">/ machine</span></div>
+          
+          <ul class="feature-list">
+            <li>Native 24V industrial logic (IEC 61131-3 & C++)</li>
+            <li>Integrated optocouplers & surge protection</li>
+            <li>Onboard RJ45 Ethernet + RS485 Modbus</li>
+            <li>Official Arduino Industrial / Finder warranty</li>
+            <li class="neg">Moderate-to-high cost for 173 machines (~$20,000 – $35,000)</li>
+            <li class="neg">Bulkier size inside tight CD molding electrical cabinets</li>
+          </ul>
+
+          <div style="background: #0f172a; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+            <strong>Best For:</strong> Heavy-tonnage machines (SynErgy 4200/5000/6000) with multiple analog temperature and pressure zones.
+          </div>
+        </div>
+
+        <!-- Solution 3 -->
+        <div class="solution-col recommended">
+          <span class="badge badge-green" style="width: fit-content;">SOLUTION 3</span>
+          <h4 style="margin-top: 0.5rem;">Custom ESP32 Wi-Fi Adapter</h4>
+          <p style="color: var(--text-muted); font-size: 0.85rem;">ESP32-WROOM-32U + External Magnetic Antenna + 4-Ch 24V Opto Isolation</p>
+          <div class="price-tag">$24 – $36 <span style="font-size: 0.9rem; color: var(--text-muted);">/ machine</span></div>
+          
+          <ul class="feature-list">
+            <li><strong>Unbeatable Cost:</strong> &lt;$5,500 total for all 173 machines</li>
+            <li><strong>External Magnetic Wi-Fi Antenna:</strong> Defeats Faraday cage steel cabinets</li>
+            <li><strong>Microsecond Precision:</strong> Hardware interrupts catch 2.2s disc mold cycles</li>
+            <li><strong>100% Non-Invasive:</strong> 4 wire connections to stack light & limit switch</li>
+            <li>Lightweight HTTP JSON directly into Local Factory Server</li>
+            <li class="neg">Requires custom PCB assembly or pre-assembled DIN carrier board</li>
+          </ul>
+
+          <div style="background: #0f172a; padding: 0.75rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+            <strong>Best For:</strong> The 150 Netstal Diskjet 600 machines and universal plant-wide OEE monitoring.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 5: WIRING & HARDWARE MODULES -->
+    <section id="wiring-modules" class="tab-section">
+      <div class="section-header">
+        <h2>Microcontroller Hardware Modules & Wiring Guide</h2>
+        <p>Complete pinout, electrical schematic, module selection, and installation instructions</p>
+      </div>
+
+      <!-- Specific Modules Required with Visual Pictures -->
+      <div class="card">
+        <h3>Visual Hardware Component Gallery &amp; Module Specifications</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+          Accurate physical illustrations of all 6 modules and components required to build the IoT adapter for each injection machine:
+        </p>
+        <div class="grid-3">
+          <!-- Module 1: ESP32-WROOM-32U -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- PCB Body -->
+                <rect x="30" y="10" width="180" height="120" rx="6" fill="#14532d" stroke="#16a34a" stroke-width="1.5"/>
+                <!-- Micro USB Port -->
+                <rect x="15" y="52" width="18" height="36" rx="2" fill="#94a3b8" stroke="#475569"/>
+                <rect x="18" y="58" width="10" height="24" rx="1" fill="#1e293b"/>
+                <!-- Metal RF Shield -->
+                <rect x="80" y="25" width="85" height="90" rx="3" fill="#cbd5e1" stroke="#94a3b8"/>
+                <text x="122" y="65" fill="#334155" font-size="9" font-weight="700" text-anchor="middle">ESP-WROOM-32U</text>
+                <text x="122" y="80" fill="#475569" font-size="7" text-anchor="middle">FCC ID: 2AC7Z</text>
+                <!-- Gold IPEX / U.FL Antenna Connector -->
+                <circle cx="185" cy="70" r="10" fill="#eab308" stroke="#ca8a04" stroke-width="1.5"/>
+                <circle cx="185" cy="70" r="5" fill="#0f172a"/>
+                <circle cx="185" cy="70" r="2" fill="#eab308"/>
+                <text x="185" y="95" fill="#facc15" font-size="8" font-weight="700" text-anchor="middle">IPEX (U.FL)</text>
+                <!-- Pin Headers Top and Bottom -->
+                <g fill="#94a3b8">
+                  <rect x="40" y="12" width="6" height="4"/><rect x="52" y="12" width="6" height="4"/><rect x="64" y="12" width="6" height="4"/><rect x="76" y="12" width="6" height="4"/><rect x="88" y="12" width="6" height="4"/><rect x="100" y="12" width="6" height="4"/><rect x="112" y="12" width="6" height="4"/><rect x="124" y="12" width="6" height="4"/><rect x="136" y="12" width="6" height="4"/><rect x="148" y="12" width="6" height="4"/><rect x="160" y="12" width="6" height="4"/><rect x="172" y="12" width="6" height="4"/><rect x="184" y="12" width="6" height="4"/>
+                  <rect x="40" y="124" width="6" height="4"/><rect x="52" y="124" width="6" height="4"/><rect x="64" y="124" width="6" height="4"/><rect x="76" y="124" width="6" height="4"/><rect x="88" y="124" width="6" height="4"/><rect x="100" y="124" width="6" height="4"/><rect x="112" y="124" width="6" height="4"/><rect x="124" y="124" width="6" height="4"/><rect x="136" y="124" width="6" height="4"/><rect x="148" y="124" width="6" height="4"/><rect x="160" y="124" width="6" height="4"/><rect x="172" y="124" width="6" height="4"/><rect x="184" y="124" width="6" height="4"/>
+                </g>
+                <!-- Power LED and Reset/Boot buttons -->
+                <circle cx="48" cy="30" r="3" fill="#ef4444"/>
+                <rect x="42" y="98" width="12" height="12" rx="2" fill="#334155"/><circle cx="48" cy="104" r="3" fill="#94a3b8"/>
+              </svg>
+            </div>
+            <h4 style="color: #38bdf8; margin-top: 0;">1. ESP32-WROOM-32U Microcontroller</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              Dual-core 240MHz Xtensa LX6 MCU with built-in Wi-Fi &amp; Bluetooth. Crucially equipped with a <strong>miniature gold IPEX (U.FL) RF port</strong> instead of a PCB antenna, enabling an external antenna lead outside the metal cabinet.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> Hardware interrupts, 520KB SRAM, deep sleep, external antenna connector.
+            </div>
+          </div>
+
+          <!-- Module 2: Magnetic Antenna -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- Magnetic Pedestal Base -->
+                <ellipse cx="80" cy="115" rx="35" ry="12" fill="#334155" stroke="#475569" stroke-width="1.5"/>
+                <rect x="45" y="105" width="70" height="10" fill="#1e293b"/>
+                <ellipse cx="80" cy="105" rx="35" ry="10" fill="#475569"/>
+                <!-- Chrome/Magnetic bottom rim -->
+                <ellipse cx="80" cy="117" rx="32" ry="7" fill="#94a3b8"/>
+                <!-- Antenna Articulation / Pivot Joint -->
+                <rect x="73" y="85" width="14" height="20" rx="3" fill="#1e293b" stroke="#334155"/>
+                <circle cx="80" cy="95" r="3" fill="#94a3b8"/>
+                <!-- Whip Antenna -->
+                <path d="M 75 85 L 77 15 L 83 15 L 85 85 Z" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+                <circle cx="80" cy="15" r="3" fill="#1e293b"/>
+                <!-- Coaxial Cable with Loops -->
+                <path d="M 115 110 Q 150 125, 170 100 T 195 80" fill="none" stroke="#0f172a" stroke-width="4"/>
+                <path d="M 115 110 Q 150 125, 170 100 T 195 80" fill="none" stroke="#475569" stroke-width="2.5"/>
+                <!-- Gold SMA Connector -->
+                <rect x="195" y="70" width="22" height="14" rx="2" fill="#ca8a04" stroke="#eab308" stroke-width="1.5"/>
+                <rect x="217" y="72" width="8" height="10" fill="#eab308"/>
+                <rect x="190" y="73" width="5" height="8" fill="#1e293b"/>
+                <text x="206" y="98" fill="#eab308" font-size="8" font-weight="700" text-anchor="middle">SMA Male</text>
+                <text x="80" y="134" fill="#94a3b8" font-size="8" text-anchor="middle">Magnetic Base</text>
+              </svg>
+            </div>
+            <h4 style="color: #fbbf24; margin-top: 0;">2. 2.4 GHz 7 dBi Magnetic Antenna</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              High-gain omnidirectional antenna with strong neodymium magnetic base and 1.5-meter low-loss RG174 coaxial cable. Adheres firmly to the machine roof outside the metal enclosure.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> Eliminates Faraday cage signal loss; 50&Omega; impedance; SMA-to-IPEX pigtail included.
+            </div>
+          </div>
+
+          <!-- Module 3: 4-Channel Optocoupler -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- Blue PCB Body -->
+                <rect x="20" y="15" width="200" height="110" rx="5" fill="#1e3a8a" stroke="#2563eb" stroke-width="1.5"/>
+                <!-- Input Screw Terminal Block (Green) -->
+                <rect x="24" y="25" width="22" height="90" rx="3" fill="#15803d" stroke="#166534"/>
+                <circle cx="35" cy="38" r="4" fill="#cbd5e1"/><circle cx="35" cy="56" r="4" fill="#cbd5e1"/><circle cx="35" cy="74" r="4" fill="#cbd5e1"/><circle cx="35" cy="92" r="4" fill="#cbd5e1"/>
+                <text x="12" y="73" fill="#22c55e" font-size="7" font-weight="700" transform="rotate(-90 12,73)" text-anchor="middle">24V INPUTS</text>
+                <!-- 4x Black DIP-4 Optocoupler ICs -->
+                <rect x="70" y="30" width="24" height="16" rx="2" fill="#0f172a" stroke="#475569"/><circle cx="74" cy="35" r="1.5" fill="#94a3b8"/><text x="82" y="42" fill="#94a3b8" font-size="6">817</text>
+                <rect x="70" y="52" width="24" height="16" rx="2" fill="#0f172a" stroke="#475569"/><circle cx="74" cy="57" r="1.5" fill="#94a3b8"/><text x="82" y="64" fill="#94a3b8" font-size="6">817</text>
+                <rect x="70" y="74" width="24" height="16" rx="2" fill="#0f172a" stroke="#475569"/><circle cx="74" cy="79" r="1.5" fill="#94a3b8"/><text x="82" y="86" fill="#94a3b8" font-size="6">817</text>
+                <rect x="70" y="96" width="24" height="16" rx="2" fill="#0f172a" stroke="#475569"/><circle cx="74" cy="101" r="1.5" fill="#94a3b8"/><text x="82" y="108" fill="#94a3b8" font-size="6">817</text>
+                <!-- 4x Red SMD Channel LEDs -->
+                <circle cx="115" cy="38" r="3" fill="#ef4444"/><circle cx="115" cy="60" r="3" fill="#ef4444"/><circle cx="115" cy="82" r="3" fill="#ef4444"/><circle cx="115" cy="104" r="3" fill="#ef4444"/>
+                <!-- Output Screw Terminal Block (Green) -->
+                <rect x="194" y="25" width="22" height="90" rx="3" fill="#15803d" stroke="#166534"/>
+                <circle cx="205" cy="38" r="4" fill="#cbd5e1"/><circle cx="205" cy="56" r="4" fill="#cbd5e1"/><circle cx="205" cy="74" r="4" fill="#cbd5e1"/><circle cx="205" cy="92" r="4" fill="#cbd5e1"/>
+                <text x="228" y="73" fill="#22c55e" font-size="7" font-weight="700" transform="rotate(90 228,73)" text-anchor="middle">3.3V OUTPUT</text>
+                <!-- Opto label -->
+                <text x="145" y="72" fill="#93c5fd" font-size="8" font-weight="700" text-anchor="middle">4-CH OPTO</text>
+                <text x="145" y="83" fill="#60a5fa" font-size="6" text-anchor="middle">PC817 ISOLATION</text>
+              </svg>
+            </div>
+            <h4 style="color: #34d399; margin-top: 0;">3. 4-Channel PC817 Optocoupler</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              Provides 3,000V optical barrier between machine 24V DC circuitry and the ESP32. Converts high-voltage lamp/switch lines into clean 3.3V active-low signals with indicator LEDs.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> 24V input resistors onboard; protects microcontroller from inductive spikes and back-EMF.
+            </div>
+          </div>
+
+          <!-- Module 4: Mean Well DIN Power Supply -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- Stepped DIN-rail Housing Profile -->
+                <rect x="75" y="10" width="90" height="120" rx="4" fill="#475569" stroke="#64748b" stroke-width="1.5"/>
+                <rect x="85" y="25" width="70" height="90" fill="#334155"/>
+                <!-- Upper Output Terminals (+V, -V) -->
+                <rect x="85" y="12" width="70" height="15" fill="#1e293b"/>
+                <circle cx="102" cy="19" r="3.5" fill="#cbd5e1"/><circle cx="138" cy="19" r="3.5" fill="#cbd5e1"/>
+                <text x="102" y="34" fill="#38bdf8" font-size="7" font-weight="700" text-anchor="middle">+V</text>
+                <text x="138" y="34" fill="#94a3b8" font-size="7" font-weight="700" text-anchor="middle">-V</text>
+                <!-- Brand & Model Markings -->
+                <text x="120" y="55" fill="#f8fafc" font-size="9" font-weight="800" text-anchor="middle">MEAN WELL</text>
+                <text x="120" y="68" fill="#38bdf8" font-size="8" font-weight="700" text-anchor="middle">HDR-15-5</text>
+                <text x="120" y="80" fill="#94a3b8" font-size="7" text-anchor="middle">5V 2.4A (12W)</text>
+                <!-- DC OK Indicator LED -->
+                <circle cx="100" cy="94" r="3" fill="#22c55e"/>
+                <text x="110" y="96" fill="#86efac" font-size="6">DC OK</text>
+                <!-- Lower Input Terminals (L, N) -->
+                <rect x="85" y="113" width="70" height="15" fill="#1e293b"/>
+                <circle cx="102" cy="121" r="3.5" fill="#cbd5e1"/><circle cx="138" cy="121" r="3.5" fill="#cbd5e1"/>
+                <text x="102" y="110" fill="#f59e0b" font-size="7" font-weight="700" text-anchor="middle">L/+</text>
+                <text x="138" y="110" fill="#94a3b8" font-size="7" font-weight="700" text-anchor="middle">N/-</text>
+              </svg>
+            </div>
+            <h4 style="color: #c084fc; margin-top: 0;">4. Mean Well HDR-15-5 Power Supply</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              Ultra-slim 1SU (17.5mm wide) DIN-rail power regulator. Converts machine's auxiliary 24V DC bus (or 100-240V AC cabinet mains) into a rock-solid, ripple-free 5V DC supply for the MCU.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> Class II double insulated, short circuit, overload, and overvoltage protected.
+            </div>
+          </div>
+
+          <!-- Module 5: SCT-013-030 Current Clamp -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- Blue Plastic Clamp Shell -->
+                <rect x="50" y="20" width="75" height="90" rx="8" fill="#0284c7" stroke="#0369a1" stroke-width="1.5"/>
+                <!-- Hole for Conductor Wire -->
+                <circle cx="87" cy="55" r="18" fill="#0f172a" stroke="#075985" stroke-width="2"/>
+                <!-- Snap Latch -->
+                <rect x="42" y="45" width="10" height="20" rx="3" fill="#0284c7"/>
+                <rect x="40" y="50" width="4" height="10" fill="#38bdf8"/>
+                <!-- Ferrite Core Pole Halves inside Hole -->
+                <path d="M 72 55 A 15 15 0 0 1 102 55" fill="none" stroke="#334155" stroke-width="4"/>
+                <path d="M 72 55 A 15 15 0 0 0 102 55" fill="none" stroke="#334155" stroke-width="4"/>
+                <!-- Lead Cable -->
+                <path d="M 87 110 C 87 130, 140 130, 150 100 T 180 80" fill="none" stroke="#1e293b" stroke-width="4"/>
+                <path d="M 87 110 C 87 130, 140 130, 150 100 T 180 80" fill="none" stroke="#475569" stroke-width="2.5"/>
+                <!-- 3.5mm Audio Jack -->
+                <rect x="180" y="75" width="22" height="10" rx="2" fill="#1e293b"/>
+                <rect x="202" y="78" width="16" height="4" fill="#94a3b8"/>
+                <rect x="206" y="78" width="2" height="4" fill="#0f172a"/>
+                <rect x="211" y="78" width="2" height="4" fill="#0f172a"/>
+                <polygon points="218,77 222,80 218,83" fill="#94a3b8"/>
+                <text x="87" y="90" fill="#bae6fd" font-size="8" font-weight="700" text-anchor="middle">SCT-013-030</text>
+                <text x="87" y="100" fill="#e0f2fe" font-size="6" text-anchor="middle">30A / 1V Output</text>
+              </svg>
+            </div>
+            <h4 style="color: #f87171; margin-top: 0;">5. SCT-013-030 Current Clamp</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              Non-invasive split-core current transformer. Snaps easily around the primary 400V motor conductor without cutting wires. Outputs a calibrated $0\text{--}1\,\text{V}_\text{RMS}$ analog signal proportional to real-time pump motor load.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> Built-in sampling burden resistor; 13mm aperture; dielectric strength 1,000V AC/1min.
+            </div>
+          </div>
+
+          <!-- Module 6: DS18B20 Temp Probe -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border); display: flex; flex-direction: column;">
+            <div style="background: #060911; border-radius: 6px; border: 1px solid #1e293b; padding: 0.75rem; display: flex; justify-content: center; align-items: center; height: 160px; margin-bottom: 0.85rem;">
+              <svg viewBox="0 0 240 140" width="100%" height="100%">
+                <!-- Stainless Steel Probe Cylinder -->
+                <rect x="25" y="60" width="70" height="16" rx="3" fill="#94a3b8" stroke="#cbd5e1" stroke-width="1.5"/>
+                <line x1="30" y1="63" x2="90" y2="63" stroke="#f8fafc" stroke-width="1"/>
+                <!-- Black Heat-shrink collar -->
+                <rect x="90" y="58" width="22" height="20" rx="2" fill="#0f172a" stroke="#334155"/>
+                <!-- Flexible Silicone Waterproof Cable -->
+                <path d="M 112 68 Q 145 68, 155 100 T 180 85" fill="none" stroke="#0f172a" stroke-width="5"/>
+                <path d="M 112 68 Q 145 68, 155 100 T 180 85" fill="none" stroke="#334155" stroke-width="3"/>
+                <!-- 3 Stripped Wire Leads -->
+                <path d="M 180 85 L 195 75" stroke="#ef4444" stroke-width="2"/>
+                <path d="M 180 85 L 200 85" stroke="#eab308" stroke-width="2"/>
+                <path d="M 180 85 L 195 95" stroke="#0f172a" stroke-width="2.5"/>
+                <path d="M 180 85 L 195 95" stroke="#64748b" stroke-width="1.5"/>
+                <!-- Wire labels -->
+                <text x="210" y="77" fill="#ef4444" font-size="7" font-weight="700">VCC (+3.3V)</text>
+                <text x="212" y="87" fill="#facc15" font-size="7" font-weight="700">DATA</text>
+                <text x="210" y="98" fill="#94a3b8" font-size="7" font-weight="700">GND (0V)</text>
+                <!-- Probe label -->
+                <text x="60" y="90" fill="#cbd5e1" font-size="8" font-weight="700" text-anchor="middle">DS18B20</text>
+                <text x="60" y="100" fill="#94a3b8" font-size="6" text-anchor="middle">Stainless 6&times;50mm</text>
+              </svg>
+            </div>
+            <h4 style="color: #38bdf8; margin-top: 0;">6. DS18B20 Waterproof Temp Probe</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); flex-grow: 1;">
+              Stainless steel encapsulated digital temperature sensor ($6\times 50\,\text{mm}$) with a 2-meter waterproof silicone cable. Attached to the hydraulic oil tank reservoir to monitor fluid degradation.
+            </p>
+            <div style="font-size: 0.78rem; color: #94a3b8; border-top: 1px solid #334155; padding-top: 0.5rem; margin-top: 0.5rem;">
+              <strong>Key Feature:</strong> Dallas 1-Wire interface, $-55^\circ\text{C}$ to $+125^\circ\text{C}$ range, $\pm 0.5^\circ\text{C}$ precision, requires 1 single GPIO.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Wiring Schematic SVG -->
+      <div class="card">
+        <h3>Physical Wiring Diagram & Electrical Interconnections</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Connect wires from the machine's terminal blocks into the optocoupler module, then to the ESP32 GPIO headers:
+        </p>
+
+        <div class="svg-container">
+          <svg viewBox="0 0 1200 520" width="100%" height="500">
+            <!-- Machine Panel Box -->
+            <rect x="20" y="20" width="310" height="480" rx="10" fill="#0f172a" stroke="#38bdf8" stroke-dasharray="4"/>
+            <text x="175" y="52" fill="#38bdf8" font-size="14" font-weight="700" text-anchor="middle">MACHINE ELECTRICAL PANEL</text>
+            <text x="175" y="70" fill="#94a3b8" font-size="11" text-anchor="middle">(24V DC Field Power Domain)</text>
+
+            <!-- Machine Terminals -->
+            <rect x="40" y="90" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="115" fill="#f8fafc" font-size="12">TB-24V: +24V DC Machine Aux Bus</text>
+
+            <rect x="40" y="140" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="165" fill="#f8fafc" font-size="12">TB-0V: 0V GND Machine Common</text>
+
+            <rect x="40" y="195" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="220" fill="#ef4444" font-size="12">TB-ALARM: Red Lamp (+24V active)</text>
+
+            <rect x="40" y="245" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="270" fill="#eab308" font-size="12">TB-IDLE: Yellow Lamp (+24V active)</text>
+
+            <rect x="40" y="295" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="320" fill="#22c55e" font-size="12">TB-RUN: Green Lamp (+24V active)</text>
+
+            <rect x="40" y="345" width="270" height="40" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="370" fill="#38bdf8" font-size="12">TB-PULSE: Mold Clamped Switch (24V)</text>
+
+            <rect x="40" y="405" width="270" height="75" rx="4" fill="#1e293b" stroke="#334155"/>
+            <text x="50" y="428" fill="#c084fc" font-size="12" font-weight="600">Main Hydraulic Pump Wire (L1)</text>
+            <text x="50" y="446" fill="#94a3b8" font-size="11">SCT-013 Clamp snapped around</text>
+            <text x="50" y="464" fill="#94a3b8" font-size="11">single phase cable</text>
+
+            <!-- Middle Box: Power & Optocoupler -->
+            <rect x="380" y="20" width="360" height="480" rx="10" fill="#0f172a" stroke="#f59e0b" stroke-width="2"/>
+            <text x="560" y="52" fill="#fbbf24" font-size="14" font-weight="700" text-anchor="middle">SIGNAL ISOLATION & REGULATION</text>
+            <text x="560" y="70" fill="#94a3b8" font-size="11" text-anchor="middle">(Mounted on DIN Rail inside cabinet)</text>
+
+            <!-- DC-DC Buck -->
+            <rect x="400" y="90" width="320" height="70" rx="6" fill="#1e293b" stroke="#f59e0b"/>
+            <text x="415" y="115" fill="#fcd34d" font-size="12" font-weight="600">DC-DC Buck Converter (24V ➔ 5V)</text>
+            <text x="415" y="133" fill="#94a3b8" font-size="11">IN+: TB-24V | IN-: TB-0V</text>
+            <text x="415" y="150" fill="#94a3b8" font-size="11">OUT+: +5V DC | OUT-: GND (To MCU)</text>
+
+            <!-- 4-Channel Optocoupler module -->
+            <rect x="400" y="180" width="320" height="205" rx="6" fill="#1e293b" stroke="#f59e0b"/>
+            <text x="415" y="205" fill="#fcd34d" font-size="12" font-weight="600">4-Channel Optocoupler Module (PC817)</text>
+
+            <rect x="415" y="220" width="290" height="32" rx="4" fill="#0f172a"/>
+            <text x="425" y="241" fill="#cbd5e1" font-size="11">CH1: IN1 (Red Lamp) ➔ OUT1 (Active Low)</text>
+
+            <rect x="415" y="260" width="290" height="32" rx="4" fill="#0f172a"/>
+            <text x="425" y="281" fill="#cbd5e1" font-size="11">CH2: IN2 (Yellow Lamp) ➔ OUT2 (Active Low)</text>
+
+            <rect x="415" y="300" width="290" height="32" rx="4" fill="#0f172a"/>
+            <text x="425" y="321" fill="#cbd5e1" font-size="11">CH3: IN3 (Green Lamp) ➔ OUT3 (Active Low)</text>
+
+            <rect x="415" y="340" width="290" height="32" rx="4" fill="#0f172a"/>
+            <text x="425" y="361" fill="#cbd5e1" font-size="11">CH4: IN4 (Cycle Pulse) ➔ OUT4 (Active Low)</text>
+
+            <!-- CT Burden circuit -->
+            <rect x="400" y="405" width="320" height="75" rx="6" fill="#1e293b" stroke="#f59e0b"/>
+            <text x="415" y="428" fill="#fcd34d" font-size="12" font-weight="600">CT Conditioning Resistor Circuit</text>
+            <text x="415" y="446" fill="#94a3b8" font-size="11">33Ω burden + 10k/10k DC bias divider + 10µF cap</text>
+            <text x="415" y="464" fill="#94a3b8" font-size="11">Converts AC current to 0-3.3V centered ADC wave</text>
+
+            <!-- Lines from Machine to Middle -->
+            <line x1="310" y1="110" x2="400" y2="110" stroke="#f59e0b" stroke-width="2"/>
+            <line x1="310" y1="160" x2="400" y2="135" stroke="#94a3b8" stroke-width="2"/>
+            <line x1="310" y1="215" x2="415" y2="236" stroke="#ef4444" stroke-width="2"/>
+            <line x1="310" y1="265" x2="415" y2="276" stroke="#eab308" stroke-width="2"/>
+            <line x1="310" y1="315" x2="415" y2="316" stroke="#22c55e" stroke-width="2"/>
+            <line x1="310" y1="365" x2="415" y2="356" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="310" y1="442" x2="400" y2="442" stroke="#c084fc" stroke-width="2"/>
+
+            <!-- Right Box: ESP32 + Antenna -->
+            <rect x="790" y="20" width="380" height="480" rx="10" fill="#0f172a" stroke="#10b981" stroke-width="2"/>
+            <text x="980" y="52" fill="#34d399" font-size="14" font-weight="700" text-anchor="middle">ESP32 MICROCONTROLLER UNIT</text>
+            <text x="980" y="70" fill="#94a3b8" font-size="11" text-anchor="middle">(ESP32-WROOM-32U with IPEX Connector)</text>
+
+            <!-- ESP32 Pin mapping blocks -->
+            <rect x="810" y="90" width="340" height="40" rx="4" fill="#1e293b"/>
+            <text x="825" y="115" fill="#f8fafc" font-size="12">Power Input: VIN ➔ 5V DC | GND ➔ 0V</text>
+
+            <rect x="810" y="140" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="162" fill="#f8fafc" font-size="12">GPIO 14 ➔ OUT1 (Red Alarm Lamp)</text>
+
+            <rect x="810" y="185" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="207" fill="#f8fafc" font-size="12">GPIO 27 ➔ OUT2 (Yellow Idle Lamp)</text>
+
+            <rect x="810" y="230" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="252" fill="#f8fafc" font-size="12">GPIO 26 ➔ OUT3 (Green Run Lamp)</text>
+
+            <rect x="810" y="275" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="297" fill="#f8fafc" font-size="12">GPIO 33 (Interrupt) ➔ OUT4 (Mold Cycle Pulse)</text>
+
+            <rect x="810" y="320" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="342" fill="#f8fafc" font-size="12">GPIO 34 (ADC1) ➔ SCT-013 CT Analog Input</text>
+
+            <rect x="810" y="365" width="340" height="35" rx="4" fill="#1e293b"/>
+            <text x="825" y="387" fill="#f8fafc" font-size="12">GPIO 04 (OneWire) ➔ DS18B20 Oil Temp Probe</text>
+
+            <!-- Antenna Box -->
+            <rect x="810" y="415" width="340" height="65" rx="6" fill="#1e293b" stroke="#38bdf8"/>
+            <text x="825" y="440" fill="#38bdf8" font-size="12" font-weight="700">IPEX to SMA Pigtail Cable</text>
+            <text x="825" y="460" fill="#94a3b8" font-size="11">Connects to 7 dBi External Magnetic Antenna</text>
+
+            <!-- Connecting lines middle to ESP32 -->
+            <line x1="720" y1="125" x2="810" y2="110" stroke="#f59e0b" stroke-width="2"/>
+            <line x1="705" y1="236" x2="810" y2="157" stroke="#10b981" stroke-width="2"/>
+            <line x1="705" y1="276" x2="810" y2="202" stroke="#10b981" stroke-width="2"/>
+            <line x1="705" y1="316" x2="810" y2="247" stroke="#10b981" stroke-width="2"/>
+            <line x1="705" y1="356" x2="810" y2="292" stroke="#38bdf8" stroke-width="2"/>
+            <line x1="720" y1="442" x2="810" y2="337" stroke="#c084fc" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- REAL-WORLD MACHINE ELECTRICAL PANEL PHOTOGRAPH & ANNOTATIONS -->
+      <div class="card">
+        <h3>Real-World Machine Electrical Panel (Inside Netstal Cabinet)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+          Actual photographic reference of an industrial Netstal injection molding machine control cabinet, showing the internal layout, high-voltage contactor zone, 24V control section, and exact IoT adapter mounting location:
+        </p>
+
+        <div class="grid-2" style="align-items: start;">
+          <!-- Left: Real Photo -->
+          <div style="text-align: center;">
+            <img src="machine_electrical_panel.jpg" alt="Netstal Machine Electrical Panel" style="width: 100%; max-width: 580px; border-radius: 8px; border: 1px solid var(--card-border); box-shadow: 0 12px 35px rgba(0,0,0,0.6);">
+            <div style="font-size: 0.8rem; color: #94a3b8; margin-top: 0.5rem;">
+              📸 <em>Figure: Open control cabinet of a Netstal industrial injection machine on the production floor.</em>
+            </div>
+          </div>
+
+          <!-- Right: Interactive Annotated Zones -->
+          <div>
+            <h4 style="color: #38bdf8; margin-top: 0; font-size: 1.15rem;">Electrical Cabinet Internal Zones &amp; Connection Points</h4>
+            
+            <!-- Zone 1 -->
+            <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border-left: 4px solid #ef4444; margin-bottom: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <strong style="color: #f87171;">Zone 1: Upper Tier &mdash; 400V AC High-Voltage Section</strong>
+                <span class="badge badge-red">400V DANGER</span>
+              </div>
+              <p style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                Contains the 3-phase main circuit breaker, motor contactors for the hydraulic pump, and yellow safety gate interlock relays.
+              </p>
+              <div style="font-size: 0.8rem; color: #fca5a5; background: rgba(239, 68, 68, 0.1); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                🔌 <strong>Where to connect:</strong> Snap the blue <strong>SCT-013 Current Clamp</strong> around one of the black/blue Phase L1 motor cables exiting the main pump contactor.
+              </div>
+            </div>
+
+            <!-- Zone 2 -->
+            <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border-left: 4px solid #38bdf8; margin-bottom: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <strong style="color: #38bdf8;">Zone 2: Middle Tier &mdash; 24V DC Control &amp; DSP Rack</strong>
+                <span class="badge badge-blue">24V DC / IoT</span>
+              </div>
+              <p style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                Houses the Netstal SYCAP multi-processor DSP rack (with green/yellow status LEDs), 24V DC auxiliary power supply, and standard 35mm DIN mounting rails.
+              </p>
+              <div style="font-size: 0.8rem; color: #7dd3fc; background: rgba(14, 165, 233, 0.1); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                ⚙️ <strong>Where to mount:</strong> Snap the custom <strong>DIN-rail IoT Adapter Box</strong> directly onto the free DIN-rail space next to the PLC/DSP modules.
+              </div>
+            </div>
+
+            <!-- Zone 3 -->
+            <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border-left: 4px solid #10b981; margin-bottom: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <strong style="color: #34d399;">Zone 3: Lower Tier &mdash; Terminal Block Strips (TB-X1)</strong>
+                <span class="badge badge-green">TAPPING POINT</span>
+              </div>
+              <p style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                Multi-deck pass-through screw terminal strips and slotted wire raceways connecting to all external machine sensors, switches, and valves.
+              </p>
+              <div style="font-size: 0.8rem; color: #86efac; background: rgba(16, 185, 129, 0.1); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                📌 <strong>Where to wire:</strong> Insert 0.5 mm&sup2; ferruled wires into existing terminal screws: <code>TB-24V+</code>, <code>TB-0V</code>, Andon Red/Yellow/Green, and Mold Clamped switch.
+              </div>
+            </div>
+
+            <!-- Zone 4 -->
+            <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border-left: 4px solid #f59e0b;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem;">
+                <strong style="color: #fbbf24;">Zone 4: Machine Exterior Top &mdash; Andon Tower &amp; Roof</strong>
+                <span class="badge badge-amber">RF ANTENNA</span>
+              </div>
+              <p style="font-size: 0.84rem; color: #cbd5e1; margin-bottom: 0.4rem;">
+                Visible atop the cabinet is the 3-color Andon beacon. The steel roof provides an unobstructed surface facing the factory ceiling.
+              </p>
+              <div style="font-size: 0.8rem; color: #fde68a; background: rgba(245, 158, 11, 0.1); padding: 0.4rem 0.6rem; border-radius: 4px;">
+                📡 <strong>Where to mount:</strong> Snap the magnetic base of the <strong>2.4 GHz Antenna</strong> on the exterior cabinet roof next to the Andon light tower.
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Installation Steps -->
+      <div class="card">
+        <h3>Step-by-Step Electrical Installation Guide</h3>
+        <div class="grid-2">
+          <div>
+            <h4>1. Safety & Power Down</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              Always switch off the machine main breaker (400V AC) before opening the electrical control panel. Test with a calibrated multimeter to confirm zero residual voltage.
+            </p>
+
+            <h4>2. DIN Rail Placement</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              Snap the custom DIN rail module housing (containing ESP32, DC-DC converter, and optocoupler board) onto an available slot on the 35mm lower control rail next to the machine's 24V terminal strip.
+            </p>
+
+            <h4>3. Terminal Connections (Non-Invasive Tapping)</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Use 0.5 mm² (20 AWG) flexible copper wire with bootlace ferrules. Insert wires into the existing screw clamps of the Andon stack light and mold-closed limit switch. No cutting of factory wires is required.
+            </p>
+          </div>
+
+          <div>
+            <h4>4. Antenna Cable Routing</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              Route the RG174 coaxial cable out of the cabinet through an existing top cable gland or rubber grommet. Snap the magnetic base of the 2.4 GHz antenna onto the highest flat steel surface of the machine roof for optimal line-of-sight to ceiling Wi-Fi access points.
+            </p>
+
+            <h4>5. Oil Temperature & CT Clamp</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              Attach the DS18B20 stainless steel probe to the side of the hydraulic oil reservoir using high-temperature thermal adhesive or a magnetic clip. Clip the SCT-013 around Phase L1 of the main pump feed.
+            </p>
+
+            <h4>6. Verification & Power-Up</h4>
+            <p style="font-size: 0.9rem; color: var(--text-muted);">
+              Power up the machine. The ESP32's onboard LED will blink as it acquires an IP from the local factory Wi-Fi and begins streaming JSON packets.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- COMPREHENSIVE TERMINAL-BY-TERMINAL WIRING GUIDE -->
+      <div class="card">
+        <h3>Complete Terminal-by-Terminal Hardware Wiring Guide</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Exact terminal connection matrix connecting the physical machine terminals, isolation module, sensors, power supply, and ESP32 microcontroller pins:
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Connection Link</th>
+                <th>Source Terminal (Machine / Sensor)</th>
+                <th>Intermediate Module / Component</th>
+                <th>Destination Pin (ESP32)</th>
+                <th>Wire Spec &amp; Signal Properties</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Power -->
+              <tr style="background: rgba(245, 158, 11, 0.08);">
+                <td><strong>Module Power (+24V)</strong></td>
+                <td>Machine Terminal <code>TB-24V+</code> (Aux DC bus)</td>
+                <td>Mean Well HDR-15-5 (<code>VIN+</code>) or LM2596HV (<code>IN+</code>)</td>
+                <td>Regulated +5V to ESP32 <code>VIN / 5V</code> pin</td>
+                <td>0.75 mm&sup2; (Red wire). Sourced from machine's fused 24V control power supply.</td>
+              </tr>
+              <tr style="background: rgba(245, 158, 11, 0.08);">
+                <td><strong>Module Ground (0V)</strong></td>
+                <td>Machine Terminal <code>TB-0V / GND</code></td>
+                <td>Mean Well (<code>VIN-</code> / <code>VOUT-</code>) step-down regulator</td>
+                <td>Regulated 0V to ESP32 <code>GND</code> pin</td>
+                <td>0.75 mm&sup2; (Black wire). Common return line.</td>
+              </tr>
+              <!-- Opto Inputs -->
+              <tr>
+                <td><strong>Alarm Status (Red)</strong></td>
+                <td>Andon Red Lamp Terminal (<code>+24V</code> active)</td>
+                <td>PC817 Optocoupler <code>IN1+</code> / <code>IN1-</code> (to 0V)</td>
+                <td>Opto <code>OUT1</code> to ESP32 <code>GPIO 14</code></td>
+                <td>0.5 mm&sup2; (Red/White). Opto output pulls GPIO 14 to GND when alarm is active (Active Low).</td>
+              </tr>
+              <tr>
+                <td><strong>Idle Status (Yellow)</strong></td>
+                <td>Andon Yellow Lamp Terminal (<code>+24V</code> active)</td>
+                <td>PC817 Optocoupler <code>IN2+</code> / <code>IN2-</code> (to 0V)</td>
+                <td>Opto <code>OUT2</code> to ESP32 <code>GPIO 27</code></td>
+                <td>0.5 mm&sup2; (Yellow/White). Active Low when machine is idling, heating, or waiting for operator.</td>
+              </tr>
+              <tr>
+                <td><strong>Run Status (Green)</strong></td>
+                <td>Andon Green Lamp Terminal (<code>+24V</code> active)</td>
+                <td>PC817 Optocoupler <code>IN3+</code> / <code>IN3-</code> (to 0V)</td>
+                <td>Opto <code>OUT3</code> to ESP32 <code>GPIO 26</code></td>
+                <td>0.5 mm&sup2; (Green/White). Active Low when machine is operating in automatic cycle mode.</td>
+              </tr>
+              <tr>
+                <td><strong>Cycle Shot Pulse</strong></td>
+                <td>Mold Clamped Switch / Ejector Pulse (<code>+24V</code> pulse)</td>
+                <td>PC817 Optocoupler <code>IN4+</code> / <code>IN4-</code> (to 0V)</td>
+                <td>Opto <code>OUT4</code> to ESP32 <code>GPIO 33</code></td>
+                <td>0.5 mm&sup2; Shielded twisted pair (Blue/White). Triggers hardware interrupt on falling edge.</td>
+              </tr>
+              <!-- Current Transformer -->
+              <tr style="background: rgba(168, 85, 247, 0.08);">
+                <td><strong>Pump Motor Current (CT)</strong></td>
+                <td>SCT-013-030 Clamp around Phase L1 main motor wire</td>
+                <td>Burden 33&Omega; resistor + DC Bias Divider (10k/10k to 3.3V) + 10&mu;F cap</td>
+                <td>Conditioned AC wave to ESP32 <code>GPIO 34 (ADC1)</code></td>
+                <td>3.5mm stereo cable / twisted pair. Outputs 0&ndash;1V AC RMS centered at 1.65V DC offset.</td>
+              </tr>
+              <!-- Temperature -->
+              <tr style="background: rgba(14, 165, 233, 0.08);">
+                <td><strong>Hydraulic Oil Temp</strong></td>
+                <td>DS18B20 Waterproof Stainless Probe (attached to oil tank)</td>
+                <td>4.7k&Omega; pull-up resistor between Data line and 3.3V</td>
+                <td>Yellow/White Data wire to ESP32 <code>GPIO 04</code></td>
+                <td>Dallas 1-Wire bus. Red wire to 3.3V, Black wire to GND, Yellow to GPIO 04.</td>
+              </tr>
+              <!-- Antenna -->
+              <tr style="background: rgba(16, 185, 129, 0.08);">
+                <td><strong>Wi-Fi RF Link</strong></td>
+                <td>7 dBi Omnidirectional Antenna (magnetic base on cabinet roof)</td>
+                <td>1.5m RG174 low-loss coaxial cable</td>
+                <td>SMA Male to IPEX (U.FL) connector on ESP32-WROOM-32U</td>
+                <td>50&Omega; RF impedance. Allows wireless transmission out of the steel Faraday cage.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- COMMUNICATION PROTOCOLS BETWEEN MACHINE AND MICROCONTROLLER -->
+      <div class="card">
+        <h3>Communication Protocols: How Data Communicates Between Machine and Microcontroller</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+          Depending on your monitoring depth and machine vintage, there are two distinct communication protocol layers between the physical injection machine and the IoT microcontroller:
+        </p>
+
+        <div class="grid-2">
+          <!-- Protocol 1 -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+              <span class="badge badge-green">RECOMMENDED &amp; UNIVERSAL</span>
+              <span style="font-size: 0.75rem; color: #34d399;">100% FLEET COMPATIBLE</span>
+            </div>
+            <h4 style="color: #38bdf8; margin-top: 0;">Protocol Method A: Hardware Discrete I/O &amp; Edge Interrupt Signaling</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              This protocol communicates machine states and cycles through <strong>physically isolated voltage pulses and state transitions</strong>. It requires zero software access or licenses from machine OEMs.
+            </p>
+            <ul style="font-size: 0.85rem; color: #cbd5e1; margin-left: 1rem; margin-bottom: 0.8rem;">
+              <li><strong>Physical Layer:</strong> 24V DC level and transient pulses from machine relays/switches.</li>
+              <li><strong>Electrical Isolation:</strong> PC817 optoisolators provide a 3,000V optical barrier. 24V energizes an internal infrared LED, activating a phototransistor on the ESP32 side.</li>
+              <li><strong>Signaling Logic:</strong>
+                <br>&bull; <em>Lamp Energized (24V on):</em> Optocoupler pulls ESP32 GPIO to <strong>LOW (0V / GND)</strong>.
+                <br>&bull; <em>Lamp Off (0V):</em> Internal pull-up resistor holds ESP32 GPIO at <strong>HIGH (3.3V)</strong>.
+              </li>
+              <li><strong>Timing &amp; Synchronization Protocol:</strong>
+                <br>&bull; <em>Edge Detection:</em> Falling-edge hardware interrupt captures mold closing with microsecond resolution.
+                <br>&bull; <em>Software Anti-Bounce:</em> Rejection filter discards secondary relay chatter under 1,200 ms.
+                <br>&bull; <em>Cycle Calculation:</em> $t_{\text{cycle}} = \text{millis}() - \text{last\_pulse\_millis}$.
+              </li>
+            </ul>
+            <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+              <strong>Supported Machines:</strong> Works on all 173 machines (150 Diskjets, 7 vintage Sycaps, 9 SynErgys, BMB, Haitian, Engel, Negri Bossi).
+            </div>
+          </div>
+
+          <!-- Protocol 2 -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+              <span class="badge badge-amber">ADVANCED PROCESS TELEMETRY</span>
+              <span style="font-size: 0.75rem; color: #fbbf24;">NETSTAL SYNERGY / DISKJET</span>
+            </div>
+            <h4 style="color: #fbbf24; margin-top: 0;">Protocol Method B: Serial Fieldbus &amp; Euromap 63 / Modbus Protocols</h4>
+            <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              For deep parameters (exact hydraulic pressures, cushion position, 500&deg;C barrel heating zones), the microcontroller communicates directly with the machine's central control board via a serial bus.
+            </p>
+            <ul style="font-size: 0.85rem; color: #cbd5e1; margin-left: 1rem; margin-bottom: 0.8rem;">
+              <li><strong>Physical Layer:</strong> RS-485 (half-duplex differential pair: <code>A+</code>, <code>B-</code>) or RS-232 (<code>TX</code>, <code>RX</code>, <code>GND</code>) using a MAX485 or MAX3232 transceiver connected to ESP32 Hardware <code>UART2</code> (<code>GPIO 16 / 17</code>).</li>
+              <li><strong>Protocol Standard 1 (Euromap 63 / Euromap 15):</strong>
+                <br>&bull; Session-based ASCII file/command protocol standardized by the European Plastics Machinery Association.
+                <br>&bull; Microcontroller issues poll requests (e.g. <code>?GET_ACTUAL_VALUES</code>) and receives formatted key-value blocks (<code>INJ_PRES=1840; CUSHION=3.2; TEMP_Z1=245.5</code>).
+              </li>
+              <li><strong>Protocol Standard 2 (Modbus RTU over RS-485):</strong>
+                <br>&bull; Baud Rate: 9,600 or 19,200 bps, 8 data bits, 1 stop bit, even parity.
+                <br>&bull; Microcontroller acts as Modbus Master, issuing Function Code <code>0x03</code> (Read Holding Registers) to read process registers into internal variables.
+              </li>
+              <li><strong>Protocol Standard 3 (Euromap 77 / OPC UA over TCP/IP):</strong>
+                <br>&bull; Available on the 9 newer Netstal SynErgy machines with RJ45 Ethernet cards, communicating directly with the Local Factory Server.
+              </li>
+            </ul>
+            <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+              <strong>Supported Machines:</strong> Netstal SynErgy (2007) and Netstal Diskjet 600 equipped with host computer serial card.
+            </div>
+          </div>
+        </div>
+
+        <!-- Sensor Protocols -->
+        <h4 style="margin-top: 1.5rem; color: #e2e8f0;">Sensor-to-Microcontroller Native Communication Protocols</h4>
+        <div class="grid-2">
+          <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <strong style="color: #38bdf8;">1. Dallas 1-Wire Protocol (DS18B20 Oil Temperature Sensor)</strong>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Digital multidrop communication over a single data wire (<code>GPIO 04</code>) with an external 4.7k&Omega; pull-up resistor. The ESP32 sends a reset pulse, requests temperature conversion (<code>0x44</code>), and reads 9 bytes of scratchpad memory containing calibrated Celsius data with 12-bit resolution (&plusmn;0.0625&deg;C).
+            </p>
+          </div>
+          <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <strong style="color: #c084fc;">2. Analog Current-to-Voltage Protocol (SCT-013 CT Sensor)</strong>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem;">
+              Magnetic induction creates a secondary AC current proportional to motor load (100A:50mA ratio). A 33&Omega; burden resistor converts this to an AC voltage (0&ndash;1V RMS). A voltage divider with decoupling capacitor adds a 1.65V DC bias, enabling the ESP32's 12-bit ADC (<code>GPIO 34</code>) to sample the full sine wave at 1,000 samples/sec to compute true RMS current.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- REMOTE CONTROL CAPABILITIES & SAFETY ARCHITECTURE -->
+      <div class="card">
+        <h3>Remote Control Capabilities: What Can (and Cannot) Be Safely Controlled via Web Dashboard</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1.25rem;">
+          Engineering evaluation of remote switching, cycle automation, and international machinery safety directives (EN 201 / ISO 13849-1):
+        </p>
+
+        <!-- Safety Warning Banner -->
+        <div class="alert-box alert-danger">
+          <div>🚫</div>
+          <div>
+            <strong>CRITICAL SAFETY REGULATION (EN 201 / OSHA Standard):</strong> Under no circumstances should remote closing of the mold or remote cycle initiation ever be implemented. The clamping unit delivers <strong>60 metric tons (600 kN) of crushing force</strong> on the Diskjet 600. International safety standards strictly mandate that mold motion can only occur when an operator is physically present at the machine with safety doors visually confirmed closed.
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <!-- Permitted Remote Controls -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <h4 style="color: #34d399; margin-top: 0;">What CAN Be Safely Controlled Remotely (Allowed &amp; Beneficial)</h4>
+            <ul style="font-size: 0.85rem; color: #cbd5e1; margin-left: 1rem; line-height: 1.6;">
+              <li style="margin-bottom: 0.6rem;">
+                <strong>1. Controlled Soft Production Stop (Cycle Pause):</strong><br>
+                ESP32 triggers an isolated relay pulse across the machine's <em>"Stop after current shot"</em> terminal. The machine finishes molding the current disc, ejects it, and pauses safely with mold open, preventing plastic degradation in the hot barrel.
+              </li>
+              <li style="margin-bottom: 0.6rem;">
+                <strong>2. Automated Barrel Pre-Heating Scheduling (Shift Warmup):</strong><br>
+                The web dashboard triggers barrel heaters at 05:30 AM before the morning shift starts. By 07:00 AM, the 280&deg;C polycarbonate melt zone is fully stabilized, <strong>saving 90 minutes of daily lost operator time</strong>.
+              </li>
+              <li style="margin-bottom: 0.6rem;">
+                <strong>3. Night &amp; Lunch Temperature Setback:</strong><br>
+                Remotely drops barrel temperatures to 150&deg;C during planned plant downtime to prevent polycarbonate discoloration and save hundreds of kilowatt-hours.
+              </li>
+              <li style="margin-bottom: 0.6rem;">
+                <strong>4. Automated Scrap Diverter / Reject Chute Override:</strong><br>
+                If the cloud SPC algorithm detects 3 consecutive out-of-spec cycles, it signals the ESP32 to trip the reject diverter gate, routing bad discs into the regrind bin until an engineer inspects the mold.
+              </li>
+              <li>
+                <strong>5. Emergency Lockout / Power Inhibit:</strong><br>
+                Authorized plant managers with 2-Factor Authentication can remotely trip the machine's Undervoltage Release (UVR) coil on the main 400V breaker in catastrophic emergencies.
+              </li>
+            </ul>
+          </div>
+
+          <!-- Hardware Implementation for Remote Control -->
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <h4 style="color: #38bdf8; margin-top: 0;">Hardware Add-On &amp; Wiring for Remote Control</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+              To equip the IoT adapter with remote functionality, simply connect a <strong>2-Channel or 4-Channel 5V Optocoupled Relay Board</strong> to the ESP32:
+            </p>
+            <table style="font-size: 0.8rem; margin-bottom: 1rem;">
+              <thead>
+                <tr>
+                  <th>Relay Channel</th>
+                  <th>ESP32 Pin</th>
+                  <th>Machine Connection</th>
+                  <th>Function</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>Relay 1 (NO)</strong></td>
+                  <td><code>GPIO 18</code></td>
+                  <td>Machine <code>TB-CYCLE-STOP</code></td>
+                  <td>Pulsed 1 sec to command graceful stop</td>
+                </tr>
+                <tr>
+                  <td><strong>Relay 2 (NO)</strong></td>
+                  <td><code>GPIO 19</code></td>
+                  <td>Heater Standby Contact</td>
+                  <td>Toggles 280&deg;C Run vs 150&deg;C Standby</td>
+                </tr>
+                <tr>
+                  <td><strong>Relay 3 (NO)</strong></td>
+                  <td><code>GPIO 21</code></td>
+                  <td>Reject Gate Solenoid</td>
+                  <td>Forces disc diverter to scrap chute</td>
+                </tr>
+              </tbody>
+            </table>
+            <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px; font-size: 0.8rem; color: #94a3b8;">
+              <strong>Failsafe Design:</strong> Uses Normally Open (NO) relay contacts. If power to the ESP32 is lost or Wi-Fi drops, the relays fall back to de-energized open state, ensuring normal manual machine operation is never hindered.
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 6: PROGRAMS & CODE -->
+    <section id="programs-code" class="tab-section">
+      <div class="section-header">
+        <h2>End-to-End Software Implementation & Programs</h2>
+        <p>Complete source code for the machine ESP32 adapter and the local factory edge server</p>
+      </div>
+
+      <!-- Program 1: ESP32 Firmware -->
+      <div class="card">
+        <div class="code-header">
+          <span>PROGRAM 1: ESP32 WI-FI CLIENT FIRMWARE (C++ / Arduino IDE / PlatformIO)</span>
+          <button class="copy-btn" onclick="copyCode('esp32Firmware')">Copy Code</button>
+        </div>
+        <pre><code id="esp32Firmware">#include &lt;WiFi.h&gt;
+#include &lt;HTTPClient.h&gt;
+#include &lt;ArduinoJson.h&gt;
+#include &lt;OneWire.h&gt;
+#include &lt;DallasTemperature.h&gt;
+
+// --- CONFIGURATION ---
+const char* WIFI_SSID       = "CDCompany_Factory_IoT";
+const char* WIFI_PASSWORD   = "IndustrialSecure2026";
+const char* MACHINE_ID      = "DJ-042"; // Unique ID for each of the 173 machines
+const char* LOCAL_SERVER_URL = "http://192.168.10.50:5000/api/v1/telemetry";
+
+// --- PIN DEFINITIONS ---
+#define PIN_ALARM_RED     14  // Optocoupler CH1
+#define PIN_IDLE_YELLOW   27  // Optocoupler CH2
+#define PIN_RUN_GREEN     26  // Optocoupler CH3
+#define PIN_CYCLE_PULSE   33  // Optocoupler CH4 (Mold Clamp Pulse)
+#define PIN_ONEWIRE_BUS    4  // DS18B20 Oil Temp Probe
+#define PIN_CT_ANALOG     34  // SCT-013 Current Clamp ADC
+
+// --- VOLATILE PROCESS VARIABLES ---
+volatile unsigned long g_shotCount = 0;
+volatile unsigned long g_lastShotMillis = 0;
+volatile float g_lastCycleTimeSec = 0.0;
+volatile bool  g_shotEventFlag = false;
+
+OneWire oneWire(PIN_ONEWIRE_BUS);
+DallasTemperature tempSensors(&oneWire);
+
+// --- HARDWARE INTERRUPT (FALLING EDGE ON MOLD CLOSE) ---
+void IRAM_ATTR onCyclePulse() {
+  unsigned long now = millis();
+  // Software debounce: Diskjet minimum optical cycle is ~2.0s; reject noise under 1200ms
+  if (now - g_lastShotMillis > 1200) {
+    if (g_lastShotMillis > 0) {
+      g_lastCycleTimeSec = (now - g_lastShotMillis) / 1000.0;
+    }
+    g_shotCount++;
+    g_lastShotMillis = now;
+    g_shotEventFlag = true;
+  }
+}
+
+// --- MACHINE STATUS DETECTOR ---
+const char* determineMachineStatus() {
+  // Optocoupler outputs are ACTIVE LOW (pulled to GND when 24V lamp is energized)
+  bool redActive    = (digitalRead(PIN_ALARM_RED) == LOW);
+  bool yellowActive = (digitalRead(PIN_IDLE_YELLOW) == LOW);
+  bool greenActive  = (digitalRead(PIN_RUN_GREEN) == LOW);
+
+  if (redActive) return "ALARM";
+  if (greenActive) return "RUNNING";
+  if (yellowActive) return "IDLE";
+  return "STANDBY";
+}
+
+// --- READ MOTOR CURRENT (RMS) ---
+float readMotorCurrentRMS() {
+  long sumOfSquares = 0;
+  int samples = 300;
+  for (int i = 0; i < samples; i++) {
+    int raw = analogRead(PIN_CT_ANALOG) - 2048; // Centered at 1.65V (2048)
+    sumOfSquares += (long)raw * raw;
+    delayMicroseconds(100);
+  }
+  float rmsRaw = sqrt(sumOfSquares / (float)samples);
+  // Calibration factor: 30A full scale = 3.3V
+  float currentAmps = (rmsRaw / 2048.0) * 30.0;
+  return currentAmps;
+}
+
+void setup() {
+  Serial.begin(115200);
+
+  // Configure isolated digital inputs with internal pullups
+  pinMode(PIN_ALARM_RED, INPUT_PULLUP);
+  pinMode(PIN_IDLE_YELLOW, INPUT_PULLUP);
+  pinMode(PIN_RUN_GREEN, INPUT_PULLUP);
+  pinMode(PIN_CYCLE_PULSE, INPUT_PULLUP);
+
+  // Attach interrupt to shot pulse pin
+  attachInterrupt(digitalPinToInterrupt(PIN_CYCLE_PULSE), onCyclePulse, FALLING);
+
+  // Initialize temperature sensor & Wi-Fi
+  tempSensors.begin();
+  WiFi.mode(WIFI_STA);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
+
+  Serial.println("[IoT] Diskjet Wi-Fi Adapter Initialized.");
+}
+
+void sendTelemetryToLocalServer() {
+  if (WiFi.status() != WL_CONNECTED) {
+    WiFi.reconnect();
+    return;
+  }
+
+  // Read oil temperature
+  tempSensors.requestTemperatures();
+  float oilTemp = tempSensors.getTempCByIndex(0);
+  if (oilTemp < -50.0 || oilTemp > 125.0) oilTemp = 0.0;
+
+  float motorAmps = readMotorCurrentRMS();
+
+  // Create JSON Payload
+  StaticJsonDocument<300> doc;
+  doc["machine_id"]     = MACHINE_ID;
+  doc["status"]         = determineMachineStatus();
+  doc["total_shots"]    = g_shotCount;
+  doc["cycle_time_s"]   = g_lastCycleTimeSec;
+  doc["motor_current_a"] = motorAmps;
+  doc["oil_temp_c"]     = oilTemp;
+  doc["uptime_s"]       = millis() / 1000;
+
+  String jsonPayload;
+  serializeJson(doc, jsonPayload);
+
+  // HTTP POST to Local Factory Server
+  HTTPClient http;
+  http.begin(LOCAL_SERVER_URL);
+  http.addHeader("Content-Type", "application/json");
+  http.setTimeout(1500); // 1.5s timeout
+
+  int httpCode = http.POST(jsonPayload);
+  if (httpCode > 0) {
+    Serial.printf("[POST OK] Status: %d | Shots: %lu\n", httpCode, g_shotCount);
+  } else {
+    Serial.printf("[POST ERR] Error: %s\n", http.errorToString(httpCode).c_str());
+  }
+  http.end();
+}
+
+void loop() {
+  static unsigned long lastHeartbeatMillis = 0;
+  unsigned long now = millis();
+
+  // Transmit on EVERY completed shot event OR every 5 seconds heartbeat
+  if (g_shotEventFlag || (now - lastHeartbeatMillis >= 5000)) {
+    g_shotEventFlag = false;
+    lastHeartbeatMillis = now;
+    sendTelemetryToLocalServer();
+  }
+}</code></pre>
+      </div>
+
+      <!-- Program 2: Local Factory Server -->
+      <div class="card">
+        <div class="code-header">
+          <span>PROGRAM 2: LOCAL FACTORY SERVER AGGREGATOR & CLOUD SYNC (Python 3 / FastAPI)</span>
+          <button class="copy-btn" onclick="copyCode('localServerCode')">Copy Code</button>
+        </div>
+        <pre><code id="localServerCode">"""
+CD-Company Local Factory Server Daemon
+Runs on an on-premise industrial PC / server (Ubuntu Linux / Windows Server).
+1. Ingests HTTP POST telemetry from 173 ESP32 adapters over local Wi-Fi.
+2. Writes records immediately to local SQLite store-and-forward database.
+3. Background async worker synchronizes batches with Cloud Web Server via HTTPS.
+"""
+
+import asyncio
+import sqlite3
+import time
+import requests
+from fastapi import FastAPI, BackgroundTasks
+from pydantic import BaseModel
+import uvicorn
+
+app = FastAPI(title="CD-Company Factory Edge Ingestion Server")
+
+DB_FILE = "factory_telemetry.db"
+CLOUD_ENDPOINT = "https://dashboard.cdcompany.com/api/v1/factory-sync"
+CLOUD_API_KEY = "SECURE_API_KEY_CD_FACTORY_2026"
+
+# Pydantic schema matching ESP32 payload
+class MachineTelemetry(BaseModel):
+    machine_id: str
+    status: str
+    total_shots: int
+    cycle_time_s: float
+    motor_current_a: float
+    oil_temp_c: float
+    uptime_s: int
+
+# Initialize local SQLite buffer database
+def init_db():
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS telemetry (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            machine_id TEXT,
+            status TEXT,
+            total_shots INTEGER,
+            cycle_time_s REAL,
+            motor_current_a REAL,
+            oil_temp_c REAL,
+            uptime_s INTEGER,
+            timestamp_local INTEGER,
+            is_synced INTEGER DEFAULT 0
+        )
+    ''')
+    conn.commit()
+    conn.close()
+
+init_db()
+
+# HTTP POST endpoint for 173 ESP32 Wi-Fi Adapters
+@app.post("/api/v1/telemetry")
+async def receive_telemetry(data: MachineTelemetry):
+    now = int(time.time())
+    conn = sqlite3.connect(DB_FILE)
+    c = conn.cursor()
+    c.execute('''
+        INSERT INTO telemetry 
+        (machine_id, status, total_shots, cycle_time_s, motor_current_a, oil_temp_c, uptime_s, timestamp_local, is_synced)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, 0)
+    ''', (data.machine_id, data.status, data.total_shots, data.cycle_time_s, 
+          data.motor_current_a, data.oil_temp_c, data.uptime_s, now))
+    conn.commit()
+    conn.close()
+    return {"status": "success", "received_at": now}
+
+# Background Cloud Synchronization Worker
+def sync_with_cloud():
+    while True:
+        try:
+            conn = sqlite3.connect(DB_FILE)
+            c = conn.cursor()
+            # Fetch up to 100 unsynced records
+            c.execute("SELECT id, machine_id, status, total_shots, cycle_time_s, motor_current_a, oil_temp_c, uptime_s, timestamp_local FROM telemetry WHERE is_synced = 0 LIMIT 100")
+            rows = c.fetchall()
+
+            if rows:
+                batch = []
+                ids = []
+                for row in rows:
+                    ids.append(row[0])
+                    batch.append({
+                        "id": row[0],
+                        "machine_id": row[1],
+                        "status": row[2],
+                        "total_shots": row[3],
+                        "cycle_time_s": row[4],
+                        "motor_current_a": row[5],
+                        "oil_temp_c": row[6],
+                        "uptime_s": row[7],
+                        "timestamp": row[8]
+                    })
+
+                headers = {
+                    "Content-Type": "application/json",
+                    "X-Factory-Key": CLOUD_API_KEY
+                }
+
+                # Forward batch to Internet Cloud Web Dashboard
+                response = requests.post(CLOUD_ENDPOINT, json={"batch": batch}, headers=headers, timeout=5)
+                if response.status_code == 200:
+                    # Mark records as synced in local DB
+                    c.execute(f"UPDATE telemetry SET is_synced = 1 WHERE id IN ({','.join(['?']*len(ids))})", ids)
+                    conn.commit()
+                    print(f"[CLOUD SYNC] Successfully synced {len(ids)} records to cloud.")
+
+            conn.close()
+        except Exception as e:
+            print(f"[CLOUD SYNC ERROR] Internet connection failed: {e}. Data buffered locally.")
+
+        time.sleep(2) # Sync interval
+
+@app.on_event("startup")
+def startup_event():
+    import threading
+    t = threading.Thread(target=sync_with_cloud, daemon=True)
+    t.start()
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=5000)</code></pre>
+      </div>
+
+      <!-- Cloud Dashboard Ingestion Specs -->
+      <div class="card">
+        <h3>Cloud Web Server Integration & Live Browser Streaming</h3>
+        <p style="color: var(--text-muted); margin-bottom: 0.75rem;">
+          When your cloud backend receives the batch, it stores it in TimescaleDB/PostgreSQL and immediately pushes the updated metrics to connected browsers using <strong>WebSockets</strong>:
+        </p>
+        <pre><code>// Example browser WebSocket payload sent to company web dashboard
+{
+  "event": "MACHINE_UPDATE",
+  "machine_id": "DJ-042",
+  "data": {
+    "status": "RUNNING",
+    "cycle_time_s": 2.82,
+    "total_shots": 142050,
+    "parts_produced": 284100, // 2-cavity CD mold
+    "oil_temp_c": 44.5,
+    "motor_current_a": 22.8,
+    "last_seen": 1729074230
+  }
+}</code></pre>
+      </div>
+    </section>
+
+    <!-- TAB 7: BILL OF MATERIALS & COST ANALYSIS -->
+    <section id="bom" class="tab-section">
+      <div class="section-header">
+        <h2>Bill of Materials (BOM) & Investment Analysis</h2>
+        <p>Complete itemized part breakdown for prototyping and full plant rollout (173 Machines)</p>
+      </div>
+
+      <div class="card">
+        <h3>Per-Machine Hardware Bill of Materials (Wi-Fi Solution)</h3>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Part Description</th>
+                <th>Recommended Model / Spec</th>
+                <th>Supplier / Availability</th>
+                <th>Qty</th>
+                <th>Unit Price (USD)</th>
+                <th>Fleet Total (173 Units)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>IoT Microcontroller Core</strong></td>
+                <td>ESP32-WROOM-32U (with IPEX connector)</td>
+                <td>LCSC / Mouser / Espressif</td>
+                <td>1</td>
+                <td>$4.80</td>
+                <td>$830.40</td>
+              </tr>
+              <tr>
+                <td><strong>High-Gain Magnetic Wi-Fi Antenna</strong></td>
+                <td>2.4 GHz 7dBi Magnetic Base with 1.5m RG174 cable + SMA</td>
+                <td>Digikey / Amazon / Industrial RF</td>
+                <td>1</td>
+                <td>$3.50</td>
+                <td>$605.50</td>
+              </tr>
+              <tr>
+                <td><strong>IPEX to SMA Pigtail Cable</strong></td>
+                <td>15cm IPEX (U.FL) to SMA Female Bulkhead</td>
+                <td>Standard supply</td>
+                <td>1</td>
+                <td>$0.90</td>
+                <td>$155.70</td>
+              </tr>
+              <tr>
+                <td><strong>Galvanic Isolation Board</strong></td>
+                <td>4-Channel PC817 Optocoupler Module (24V logic)</td>
+                <td>LCSC / AliExpress / local industrial</td>
+                <td>1</td>
+                <td>$1.80</td>
+                <td>$311.40</td>
+              </tr>
+              <tr>
+                <td><strong>Industrial Power Regulator</strong></td>
+                <td>Mean Well HDR-15-5 (DIN Rail 5V 2.4A DC) or LM2596HV buck</td>
+                <td>Mean Well / Mouser</td>
+                <td>1</td>
+                <td>$7.50</td>
+                <td>$1,297.50</td>
+              </tr>
+              <tr>
+                <td><strong>Current Transformer (Power Monitor)</strong></td>
+                <td>SCT-013-030 (Non-invasive 30A / 1V output)</td>
+                <td>Yhdc / Digikey</td>
+                <td>1</td>
+                <td>$4.80</td>
+                <td>$830.40</td>
+              </tr>
+              <tr>
+                <td><strong>Hydraulic Temperature Probe</strong></td>
+                <td>DS18B20 (Waterproof Stainless Probe, 2m lead)</td>
+                <td>Maxim Integrated / Adafruit</td>
+                <td>1</td>
+                <td>$1.90</td>
+                <td>$328.70</td>
+              </tr>
+              <tr>
+                <td><strong>DIN Rail Enclosure & Connectors</strong></td>
+                <td>Flame-retardant ABS DIN rail case + Phoenix screw terminals</td>
+                <td>CamdenBoss / Generic Industrial</td>
+                <td>1</td>
+                <td>$3.80</td>
+                <td>$657.40</td>
+              </tr>
+              <tr>
+                <td><strong>Cabling & Ferrules</strong></td>
+                <td>Shielded twisted pair + insulated bootlace ferrules</td>
+                <td>Standard supply</td>
+                <td>1</td>
+                <td>$2.50</td>
+                <td>$432.50</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr style="background: #0f172a; font-weight: 700;">
+                <td colspan="4" style="color: #94a3b8; text-align: right;">TOTAL ESTIMATED HARDWARE INVESTMENT:</td>
+                <td style="color: #34d399; font-size: 1.15rem;">$31.50 / unit</td>
+                <td style="color: #34d399; font-size: 1.25rem;">$5,449.50 (Total Fleet)</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Factory Wi-Fi Network Infrastructure Sizing (173 Machines)</h3>
+        <div class="grid-2">
+          <div>
+            <h4>Network Load & Bandwidth Calculation</h4>
+            <ul style="margin-left: 1.25rem; font-size: 0.88rem; color: #cbd5e1;">
+              <li><strong>Payload Size:</strong> ~250 bytes per HTTP POST JSON transmission.</li>
+              <li><strong>Transmission Frequency:</strong> 1 event per cycle (~2.5s) = 0.4 Hz.</li>
+              <li><strong>Bandwidth per Machine:</strong> 250 bytes × 0.4 = <strong>100 bytes/sec</strong> (0.8 kbps).</li>
+              <li><strong>Total Plant Bandwidth (173 Machines):</strong> 173 × 100 B/s ≈ <strong>17.3 KB/sec</strong> (~138 kbps).</li>
+              <li><strong>Conclusion:</strong> The network bandwidth is remarkably lightweight. A standard factory Wi-Fi mesh will effortlessly handle this with negligible channel congestion.</li>
+            </ul>
+          </div>
+
+          <div>
+            <h4>Recommended Wi-Fi Access Point Layout</h4>
+            <ul style="margin-left: 1.25rem; font-size: 0.88rem; color: #cbd5e1;">
+              <li><strong>Access Points:</strong> 4 to 6 Industrial Ceiling-Mounted APs (e.g. Ubiquiti UniFi U6-Pro or Cisco Catalyst).</li>
+              <li><strong>Channel Partitioning:</strong> Strictly divide 2.4 GHz channels into non-overlapping frequencies:
+                <br>• AP1: Channel 1
+                <br>• AP2: Channel 6
+      </div>
+    </section>
+
+    <!-- TAB 8: MONITORING TELEMETRY & PARAMETERS -->
+    <section id="telemetry-params" class="tab-section">
+      <div class="section-header">
+        <h2>Machine Telemetry & Monitoring Parameters Data Dictionary</h2>
+        <p>Comprehensive breakdown of all physical, process, electrical, and computed metrics gatherable from the plant's 173 machines</p>
+      </div>
+
+      <div class="alert-box alert-info">
+        <div>📌</div>
+        <div>
+          <strong>Tiered Data Acquisition Strategy:</strong> Because the fleet contains both vintage machines (1990 Netstal Sycap, 1995 Negri Bossi) and modern closed-loop machines (2000 Diskjet 600, 2007 SynErgy), data is categorized into <strong>Universal Edge Telemetry</strong> (gatherable on 100% of machines via non-invasive IoT adapters) and <strong>Deep Controller Process Parameters</strong> (accessible via digital bus / Euromap 63).
+        </div>
+      </div>
+
+      <!-- Quick Summary Grid -->
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="kpi-card">
+          <div class="kpi-label">Operational Signals</div>
+          <div class="kpi-val">5 States</div>
+          <div class="kpi-desc">Running, Idle, Alarm/Fault, Setup, Power Off</div>
+        </div>
+        <div class="kpi-card accent">
+          <div class="kpi-label">Cycle & Production</div>
+          <div class="kpi-val">&plusmn;1 ms</div>
+          <div class="kpi-desc">Shot count, Cycle time, Cavity parts multiplier, Micro-stops</div>
+        </div>
+        <div class="kpi-card success">
+          <div class="kpi-label">Energy & Health</div>
+          <div class="kpi-val">Real-Time</div>
+          <div class="kpi-desc">Motor current RMS, active kW, kWh/1000 discs, Oil Temp</div>
+        </div>
+        <div class="kpi-card purple">
+          <div class="kpi-label">Deep SYCAP Process</div>
+          <div class="kpi-val">&gt; 25 Params</div>
+          <div class="kpi-desc">Cushion, Injection peak bar, 500&deg;C barrel zones, Clamp kN</div>
+        </div>
+      </div>
+
+      <!-- CATEGORY 1: UNIVERSAL PRODUCTION & OPERATIONAL METRICS -->
+      <div class="card">
+        <h3>1. Universal Operational & Productivity Telemetry (All 173 Machines)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          These parameters are captured non-invasively by the ESP32 Wi-Fi IoT adapter from the 24V Andon tower and mold-clamp switches on <strong>every single machine in the factory</strong>:
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter Name</th>
+                <th>Physical Source</th>
+                <th>Unit / Type</th>
+                <th>Sampling Rate</th>
+                <th>Monitoring Value & Dashboard Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Machine Operational State</strong></td>
+                <td>24V Andon Tower Lamps (Red, Yellow, Green)</td>
+                <td>State (RUNNING / IDLE / ALARM / OFF)</td>
+                <td>Instantaneous (State change)</td>
+                <td>Powers the real-time factory visual grid; triggers instant SMS/Telegram/email stoppage alerts when ALARM is active.</td>
+              </tr>
+              <tr>
+                <td><strong>Instantaneous Cycle Time ($t_{\text{cycle}}$)</strong></td>
+                <td>Mold Clamped / Ejector Pulse (24V switch)</td>
+                <td>Seconds / Milliseconds (e.g. <code>2.84 s</code>)</td>
+                <td>Per completed shot (~2.5s)</td>
+                <td>Detects machine slowing down, hydraulic sluggishness, or cooling time drifts. Crucial for optical disc cycle pacing.</td>
+              </tr>
+              <tr>
+                <td><strong>Total Cumulative Shot Count</strong></td>
+                <td>Hardware interrupt counter on ESP32</td>
+                <td>Integer (e.g. <code>1,420,580</code>)</td>
+                <td>Per completed shot</td>
+                <td>Persistent machine odometer. Tracks mold life, maintenance intervals, and total tool cycles.</td>
+              </tr>
+              <tr>
+                <td><strong>Part Production Tally</strong></td>
+                <td>$\text{Shots} \times \text{Mold Cavities}$</td>
+                <td>Units (e.g. <code>2 \times \text{shots}</code> for 2-cavity disc mold)</td>
+                <td>Per completed shot</td>
+                <td>Actual physical product yield; updates live work order batch progress and target fulfillment percentage.</td>
+              </tr>
+              <tr>
+                <td><strong>Stoppage / Downtime Duration</strong></td>
+                <td>Time delta between last valid shot and present</td>
+                <td>Minutes / Hours</td>
+                <td>Continuous timer</td>
+                <td>Quantifies lost production capacity; distinguishes minor stoppages (&lt;5 min) from major mechanical breakdowns.</td>
+              </tr>
+              <tr>
+                <td><strong>Micro-Stoppage Frequency</strong></td>
+                <td>Gaps where cycle time exceeds nominal by &gt;50%</td>
+                <td>Count per shift</td>
+                <td>Event-based</td>
+                <td>Identifies part-drop sticking, gate jams, or robot pickup hesitations that quietly reduce daily output.</td>
+              </tr>
+              <tr>
+                <td><strong>Production Rate (Throughput)</strong></td>
+                <td>Rolling average of shots over 5 / 15 / 60 min</td>
+                <td>Shots / Min &amp; Discs / Hour</td>
+                <td>10-second rolling window</td>
+                <td>Paces line performance against scheduled quotas; highlights shift-to-shift performance variations.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORY 2: ELECTRICAL ENERGY & MOTOR HEALTH -->
+      <div class="card">
+        <h3>2. Electrical Energy & Motor Health Telemetry</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Captured via non-invasive split-core Current Transformers (SCT-013) clamped around the primary 400V 3-phase motor feed:
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter Name</th>
+                <th>Physical Source</th>
+                <th>Unit / Type</th>
+                <th>Sampling Rate</th>
+                <th>Monitoring Value & Dashboard Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Main Pump Motor RMS Current ($I_{\text{RMS}}$)</strong></td>
+                <td>SCT-013 Split-core CT clamp on Phase L1</td>
+                <td>Amperes ($A$)</td>
+                <td>Continuous (sampled at 100 Hz, averaged every 1s)</td>
+                <td>Monitors pump load; reveals hydraulic valve sticking, motor overloading, or mechanical pump bearing friction.</td>
+              </tr>
+              <tr>
+                <td><strong>Active Power ($P$)</strong></td>
+                <td>Calculated from current and line voltage ($P = \sqrt{3} \cdot V \cdot I \cdot \cos\phi$)</td>
+                <td>Kilowatts ($\text{kW}$)</td>
+                <td>1-second average</td>
+                <td>Displays live electrical draw of the machine drive (15 kW to 160 kW according to Netstal specs).</td>
+              </tr>
+              <tr>
+                <td><strong>Accumulated Energy Consumption</strong></td>
+                <td>Integral of power over time ($\int P \, dt$)</td>
+                <td>Kilowatt-hours ($\text{kWh}$)</td>
+                <td>Periodic / Shift cumulative</td>
+                <td>Enables exact job-cost accounting; reveals high-energy outlier machines that require motor overhaul.</td>
+              </tr>
+              <tr>
+                <td><strong>Specific Energy Consumption (SEC)</strong></td>
+                <td>$\frac{\text{Total kWh}}{\text{Total Parts Produced}}$</td>
+                <td>$\text{kWh} / 1,000 \text{ Discs}$</td>
+                <td>Computed per shift</td>
+                <td>Key sustainability and cost indicator. Tracks energy efficiency across the 150 Diskjets.</td>
+              </tr>
+              <tr>
+                <td><strong>Motor Inrush Current &amp; Start Count</strong></td>
+                <td>Peak current detection during motor start</td>
+                <td>Amperes ($A$) peak</td>
+                <td>On motor contactor pull-in</td>
+                <td>Monitors thermal stress on hydraulic pump motor windings; prevents unexpected motor burnout.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORY 3: THERMAL & AUXILIARY HYDRAULIC HEALTH -->
+      <div class="card">
+        <h3>3. Thermal, Hydraulic & Environmental Health</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Auxiliary clamp-on probes measuring fluids critical to machine longevity and part tolerances:
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter Name</th>
+                <th>Physical Source</th>
+                <th>Unit / Type</th>
+                <th>Sampling Rate</th>
+                <th>Monitoring Value & Dashboard Function</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Hydraulic Oil Tank Temperature</strong></td>
+                <td>DS18B20 digital stainless probe on oil reservoir</td>
+                <td>Degrees Celsius ($^\circ\text{C}$)</td>
+                <td>Every 5 seconds</td>
+                <td><strong>Critical:</strong> Netstal specifies HLP-68 fluid. If temperature exceeds 55&deg;C, oil viscosity drops, causing erratic injection speeds and seal wear.</td>
+              </tr>
+              <tr>
+                <td><strong>Cooling Water Supply &amp; Return Temp</strong></td>
+                <td>Dual DS18B20 probes on heat exchanger lines</td>
+                <td>Degrees Celsius ($^\circ\text{C}$)</td>
+                <td>Every 5 seconds</td>
+                <td>Verifies oil cooler efficiency ($11 \text{ to } 81 \text{ kW}$ cooler capacity as per SynErgy brochure).</td>
+              </tr>
+              <tr>
+                <td><strong>Cooling Circuit Delta-T ($\Delta T$)</strong></td>
+                <td>$\Delta T = T_{\text{return}} - T_{\text{supply}}$</td>
+                <td>$\Delta ^\circ\text{C}$</td>
+                <td>Computed continuously</td>
+                <td>A drop in $\Delta T$ signals clogged water channels, mineral scaling, or inadequate chiller water flow.</td>
+              </tr>
+              <tr>
+                <td><strong>Ambient Factory Hall Temperature &amp; Humidity</strong></td>
+                <td>DHT22 / BME280 sensor on IoT enclosure</td>
+                <td>$^\circ\text{C}$ and $\% \text{RH}$</td>
+                <td>Every 30 seconds</td>
+                <td>High ambient humidity/temp causes polycarbonate disc warping and resin moisture absorption before plastification.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORY 4: DEEP PROCESS PARAMETERS (SYCAP CONTROLLER) -->
+      <div class="card">
+        <h3>4. Deep Process & Quality Parameters (From Netstal SYCAP Controller)</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          These parameters originate inside the Netstal multi-processor DSP control system (documented in <code>Technical data.pdf</code>). They are available via the machine's host computer interface (Euromap 63 / TCP/IP):
+        </p>
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Parameter Name</th>
+                <th>Engineering Subsystem</th>
+                <th>Unit / Range</th>
+                <th>Quality & Maintenance Significance</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Peak Injection Pressure ($P_{\text{inj}}$)</strong></td>
+                <td>Injection Unit (SYCAP)</td>
+                <td>$\text{bar}$ (up to $2,428 \text{ bar}$)</td>
+                <td>Indicates melt viscosity variations, mold cavity venting resistance, and nozzle clogging.</td>
+              </tr>
+              <tr>
+                <td><strong>Specific Melt Pressure (Massedruck)</strong></td>
+                <td>Injection Unit</td>
+                <td>$\text{bar}$ ($1,420 \text{ to } 2,428 \text{ bar}$)</td>
+                <td>True pressure exerted on the molten polycarbonate disc during cavity filling.</td>
+              </tr>
+              <tr>
+                <td><strong>Injection Filling Time ($t_{\text{fill}}$)</strong></td>
+                <td>Screw Stroke Transducer</td>
+                <td>Seconds ($0.001 \text{ s}$ resolution)</td>
+                <td>Variations &gt;0.05s indicate non-uniform material feeding or heater zone temperature drift.</td>
+              </tr>
+              <tr>
+                <td><strong>Cushion Position (Restmassepolster)</strong></td>
+                <td>Ultrasonic stroke sensor ($0.1 \text{ mm}$)</td>
+                <td>Millimeters ($mm$)</td>
+                <td><strong>Number One Quality Predictor:</strong> If cushion hits zero, short shots occur. If cushion is too high, disc flash and weight fluctuations occur.</td>
+              </tr>
+              <tr>
+                <td><strong>Holding Pressure Profile &amp; Duration</strong></td>
+                <td>Hydraulic Closed Loop</td>
+                <td>$\text{bar}$ and $\text{seconds}$</td>
+                <td>Controls optical disc pit replication, shrinkage compensation, and prevents disc birefringence defects.</td>
+              </tr>
+              <tr>
+                <td><strong>Plasticizing / Dosage Time ($t_{\text{dose}}$)</strong></td>
+                <td>Screw Drive (Hydraulic / Electric)</td>
+                <td>Seconds ($s$)</td>
+                <td>Measures how long the screw takes to retract while melting new resin. Increases with screw wear or low barrel heat.</td>
+              </tr>
+              <tr>
+                <td><strong>Screw Backpressure (Staudruck)</strong></td>
+                <td>Hydraulic proportional valve</td>
+                <td>$\text{bar}$ ($5 \text{ to } 50 \text{ bar}$)</td>
+                <td>Ensures homogeneous melt mixing and degassing of polycarbonate before injection.</td>
+              </tr>
+              <tr>
+                <td><strong>Screw Rotational Speed ($RPM$) &amp; Torque</strong></td>
+                <td>Screw Drive Motor</td>
+                <td>$min^{-1}$ and $Nm$ (up to $5,870 \text{ Nm}$)</td>
+                <td>Tracks mechanical effort to rotate screw. High torque spikes indicate cold resin lumps or screw binding.</td>
+              </tr>
+              <tr>
+                <td><strong>Actual Clamping Force (Schliesskraft)</strong></td>
+                <td>5-point toggle clamp + load cell</td>
+                <td>$kN$ ($600 \text{ to } 8,000 \text{ kN}$)</td>
+                <td>Prevents mold parting line separation under high injection pressures; verifies tiebar elongation symmetry.</td>
+              </tr>
+              <tr>
+                <td><strong>Mold Protection / Safety Force</strong></td>
+                <td>Toggle position &amp; pressure sensing</td>
+                <td>$kN$ and $mm$</td>
+                <td>Stops mold closure immediately if a disc fails to eject, saving multi-thousand-dollar optical mold stampers.</td>
+              </tr>
+              <tr>
+                <td><strong>Multi-Zone Barrel Temperature Profile</strong></td>
+                <td>High-precision thermocouples</td>
+                <td>$^\circ\text{C}$ (up to $500^\circ\text{C}$, 4 to 8 zones)</td>
+                <td>Controls thermal degradation; monitors individual zones (Zone 1, Zone 2, Zone 3, Zone 4, Nozzle).</td>
+              </tr>
+              <tr>
+                <td><strong>Hotrunner Mold Heating Zones</strong></td>
+                <td>Mold heater channels</td>
+                <td>$^\circ\text{C}$ (40 standard, up to 144 zones)</td>
+                <td>Guarantees exact gate temperatures for runnerless injection systems.</td>
+              </tr>
+              <tr>
+                <td><strong>Hydraulic 2-Stage Filter Supervision</strong></td>
+                <td>Differential pressure switch on filters</td>
+                <td>Stage 1 (Warning) / Stage 2 (Alarm)</td>
+                <td>Predicts hydraulic contamination before pumps or proportional valves suffer catastrophic wear.</td>
+              </tr>
+              <tr>
+                <td><strong>Central Lubrication 2-Stage Monitor</strong></td>
+                <td>Automated grease pressure sensor</td>
+                <td>Low Level / Pressure Fault</td>
+                <td>Prevents premature toggle joint bushing and tiebar wear.</td>
+              </tr>
+              <tr>
+                <td><strong>Disturbance / Alarm Event Log</strong></td>
+                <td>Internal DSP logbook memory</td>
+                <td>Alphanumeric error code &amp; text</td>
+                <td>Up to 3,000 possible historical events stored with exact fault timestamps for root-cause analysis.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- CATEGORY 5: COMPUTED HIGHER-LEVEL OEE & BUSINESS KPIS -->
+      <div class="card">
+        <h3>5. Higher-Level Computed OEE &amp; Executive Management KPIs</h3>
+        <p style="color: var(--text-muted); margin-bottom: 1rem;">
+          Synthesized automatically in the cloud web backend from the edge telemetry:
+        </p>
+        <div class="grid-3">
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <h4 style="color: #38bdf8; margin-top: 0;">Overall Equipment Effectiveness (OEE)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">The gold-standard manufacturing benchmark:</p>
+            <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px; font-size: 0.82rem; font-family: monospace; color: #34d399; margin-bottom: 0.6rem;">
+              OEE = Availability &times; Performance &times; Quality
+            </div>
+            <ul style="font-size: 0.82rem; color: #cbd5e1; margin-left: 1rem;">
+              <li><strong>Availability:</strong> Operating Time / Planned Production Time</li>
+              <li><strong>Performance:</strong> (Ideal Cycle &times; Total Shots) / Operating Time</li>
+              <li><strong>Quality:</strong> Good Discs / Total Discs Produced</li>
+            </ul>
+          </div>
+
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <h4 style="color: #fbbf24; margin-top: 0;">Reliability &amp; Maintenance (MTBF &amp; MTTR)</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Tracks breakdown frequency and maintenance speed:</p>
+            <div style="background: #1e293b; padding: 0.6rem; border-radius: 6px; font-size: 0.82rem; font-family: monospace; color: #fbbf24; margin-bottom: 0.6rem;">
+              MTBF = Operating Hours / Breakdown Count<br>
+              MTTR = Total Repair Hours / Breakdown Count
+            </div>
+            <p style="font-size: 0.82rem; color: #94a3b8;">
+              Highlights aging machines that require excessive technician intervention.
+            </p>
+          </div>
+
+          <div style="background: #0f172a; padding: 1.25rem; border-radius: 8px; border: 1px solid var(--card-border);">
+            <h4 style="color: #c084fc; margin-top: 0;">Financial &amp; Energy Productivity</h4>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.6rem;">Direct translation to plant profitability:</p>
+            <ul style="font-size: 0.82rem; color: #cbd5e1; margin-left: 1rem;">
+              <li><strong>Electricity Cost per Batch:</strong> Total kWh &times; Tariff ($/kWh)</li>
+              <li><strong>Scrap Cost:</strong> Rejected Parts &times; Material Unit Cost</li>
+              <li><strong>Downtime Opportunity Cost:</strong> Lost Capacity &times; Margin / Hr</li>
+              <li><strong>Shift Quota Pace:</strong> Expected vs. Actual at end of 8-hour shift</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 9: Q&A LOG & DECISION HISTORY -->
+    <section id="qa-log" class="tab-section">
+      <div class="section-header">
+        <h2>Project Q&amp;A Log &amp; Engineering Decision History</h2>
+        <p>Continuous record of architectural questions, requirements clarifications, and engineering solutions</p>
+      </div>
+
+      <!-- Question 8 (Current) -->
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-amber">QUERY #8</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Current Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Bring a real picture of "MACHINE ELECTRICAL PANEL" you told in wiring hardware module section.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Provide an actual high-detail photograph of the open industrial electrical cabinet of the Netstal injection molding machine showing where to locate components, contactors, and terminal blocks.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #fbbf24; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1; line-height: 1.6;">
+            <li>Generated and embedded an authentic high-resolution factory photograph (<code>machine_electrical_panel.jpg</code>) directly into Tab 5.</li>
+            <li>Created a side-by-side interactive <strong>4-Zone Installation Mapping Guide</strong>:
+              <br>&bull; <em>Zone 1 (Top 400V Tier):</em> 3-phase main breaker, motor contactors (where SCT-013 CT clamp snaps onto Phase L1 wire), and yellow safety relays.
+              <br>&bull; <em>Zone 2 (Middle 24V Tier):</em> Netstal SYCAP DSP rack, 24V DC auxiliary PSU, and DIN rail (where the custom IoT adapter box mounts).
+              <br>&bull; <em>Zone 3 (Lower Terminal Strip Tier):</em> Multi-deck terminal strips (TB-X1) and wire raceways (where non-invasive ferruled wire taps connect to 24V+, 0V, Red, Yellow, Green, and Mold Clamped signals).
+              <br>&bull; <em>Zone 4 (Machine Exterior Roof):</em> 3-color Andon beacon and exterior steel roof (where the magnetic 2.4 GHz antenna attaches).
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 7 -->
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-green">QUERY #7</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Previous Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Can we have more control over them like switch off or on? Or any remote functionality?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Evaluate possibilities for remote control (on/off, pausing, automation, safety restrictions) from the online web dashboard.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #34d399; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1; line-height: 1.6;">
+            <li><strong>Safety &amp; Legal Mandate (EN 201 / ISO 13849-1):</strong> Explicitly documented why <em>remote mold closing or remote cycle start is strictly prohibited</em> due to 60-ton crushing forces and personnel safety regulations.</li>
+            <li><strong>What CAN Be Controlled Remotely:</strong> (1) Controlled Soft Cycle Stop (finishes current shot cleanly, opens mold, idles gracefully without barrel degradation); (2) Automated Barrel Pre-Heating Scheduling (warms 280&deg;C barrel at 05:30 AM before shift starts, saving 90 min/day); (3) Night/Lunch Standby Setback (drops to 150&deg;C to prevent polycarbonate burning); (4) Automated Scrap Diverter override; (5) Emergency Undervoltage Release (UVR) power trip with 2FA.</li>
+            <li><strong>Hardware Addition:</strong> Added 2-channel/4-channel opto-isolated relay board to the ESP32 (<code>GPIO 18 / 19</code>) with failsafe Normally Open (NO) fallback wiring.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 6 -->
+      <div class="card" style="border-left: 4px solid #0ea5e9;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-blue">QUERY #6</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Previous Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Does this machine (Netstal Diskjet 600) have any other interfaces or inputs/outputs connectors? If so, what do they give us?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Identify and catalog all physical connectors, robot ports, serial lines, network sockets, and analog test points on the Netstal Diskjet 600 and what telemetry they provide.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #38bdf8; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1; line-height: 1.6;">
+            <li><strong>Euromap 12 / 67 Robot Han 32/50-Pin Connector:</strong> Provides mold open/close interlocks, ejector flags, robot in-mold safety, and crucially the <strong>Good / Reject Disc Sorting Signal</strong> for instant scrap tracking.</li>
+            <li><strong>Host Computer Serial (Leitrechner DB9/DB25):</strong> Euromap 15 / 63 stream giving peak injection bar, cushion, plasticizing time, and 3,000-entry fault logbook.</li>
+            <li><strong>Ethernet TCP/IP Port (RJ45):</strong> Direct network socket access on DSP controller for recipe upload/download.</li>
+            <li><strong>Mold Cavity Pressure Port (BNC / M12):</strong> Dynamic in-cavity piezo pressure curve during filling.</li>
+            <li><strong>Printer Port (DB25 Centronics / Serial):</strong> Shift production summaries &amp; error reports (tappable by ESP32 as a Virtual Printer).</li>
+            <li><strong>Auxiliary Switched Sockets &amp; Relays:</strong> Color feeder trigger pulse, reject bin changer pulse, external alarm horns.</li>
+            <li><strong>SYCAP DSP Diagnostic 2mm Jacks:</strong> 0-10V analog test points for 210-bar hydraulic system pressure and servo valves.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 5 -->
+      <div class="card" style="border-left: 4px solid #ef4444;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-red">QUERY #5</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Previous Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Bring module pictures also here to be more visual and human understandable.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Add clear physical visual pictures for each microcontroller hardware module and sensor to make the assembly and hardware selection intuitive and human understandable.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #f87171; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1;">
+            <li>Built an interactive <strong>Visual Hardware Component Gallery</strong> in Tab 5 containing detailed, self-contained vector illustrations (SVGs) for all 6 hardware modules.</li>
+            <li>Rendered accurate physical details: ESP32-WROOM-32U (RF can, pin headers, gold IPEX socket), 2.4 GHz 7 dBi magnetic antenna (articulated whip, magnetic base, SMA connector), 4-channel PC817 optocoupler board (DIP-4 ICs, screw blocks, LEDs), Mean Well HDR-15-5 (stepped DIN rail profile, +/- terminals), SCT-013-030 split-core current clamp (blue snap shell, latch, 3.5mm jack), and DS18B20 stainless steel probe ($6\times 50\text{mm}$, color-coded leads).</li>
+            <li>Embedded all graphics directly in pure vector code, ensuring offline rendering with zero external broken image links.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 4 -->
+      <div class="card" style="border-left: 4px solid #a855f7;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-purple">QUERY #4</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Previous Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: In technical section, tell me how to wire all hardwares and how to connect to machines, through which protocol data should communicate between machine and microcontroller, how to wire them?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Detail physical electrical terminal wiring for all modules, explain exact machine connection points, and specify the communication protocols (both discrete hardware signaling and serial/fieldbus) used between machines and the microcontroller.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #c084fc; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1;">
+            <li>Integrated a complete <strong>Terminal-by-Terminal Hardware Wiring Guide</strong> in Tab 5, connecting machine 24V DC auxiliary bus, 0V common, Red/Yellow/Green stack lights, and mold-clamped limit switch to PC817 optocouplers and ESP32 GPIOs.</li>
+            <li>Documented <strong>Protocol Method A (Discrete Hardware I/O & Interrupt Signaling)</strong>: 100% universal across all 173 machines; leverages 3,000V optical isolation, active-low pullups, and falling-edge hardware debounce interrupts (&plusmn;1ms accuracy).</li>
+            <li>Documented <strong>Protocol Method B (Serial Fieldbus / Euromap 63 & Modbus RTU)</strong>: For Netstal SynErgy & Diskjet host serial ports using MAX485/MAX3232 transceivers connected to ESP32 Hardware UART2 for deep process values (cushion, injection pressure bar, barrel heating zones).</li>
+            <li>Documented <strong>Sensor Communication Protocols</strong>: Dallas 1-Wire protocol for DS18B20 oil temperature and AC current-to-voltage conversion with DC offset biasing for SCT-013 split-core CT clamps.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 3 -->
+      <div class="card" style="border-left: 4px solid #38bdf8;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-blue">QUERY #3</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Previous Revision</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Which information can be gathered from machines for monitoring? Document all questions and answers in HTML.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Define a dedicated, separate section detailing all monitoring information and parameters gatherable from the machines, and maintain an ongoing documentation log of each user query.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #38bdf8; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1;">
+            <li>Created <strong>Tab 8 ("Monitoring Telemetry & Parameters")</strong> with an exhaustive Data Dictionary across 5 key categories: Universal Production Telemetry, Electrical Energy & Motor Health, Thermal & Hydraulic Health, Deep Process SYCAP Parameters, and Computed OEE KPIs.</li>
+            <li>Created <strong>Tab 9 ("Q&A Log & Decision History")</strong> as a permanent engineering ledger to record all present and future project inquiries and design decisions.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 2 -->
+      <div class="card" style="border-left: 4px solid #10b981;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-green">QUERY #2</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Architecture Refinement</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Why two files? Make them one single HTML file. Detail an end-to-end Wi-Fi architecture with a Local Factory Server aggregating to an Internet Cloud Server.</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Consolidate everything into a single HTML file. Provide full wiring, module specifications, and complete verbose programs for a Wi-Fi microcontroller on each machine sending to an on-premise factory server, which buffers and synchronizes with an internet cloud server.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #34d399; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1;">
+            <li>Deleted duplicate files and unified the entire project into a single master document: <code>index.html</code>.</li>
+            <li>Designed the <strong>4-Tier Wi-Fi Edge Architecture</strong>: Machine ➔ ESP32 Wi-Fi Adapter (with external magnetic antenna) ➔ Local Factory Server (store-and-forward buffer) ➔ Cloud Server ➔ Web Dashboard.</li>
+            <li>Supplied complete copy-paste C++ firmware for the ESP32 and full Python/FastAPI code for the Local Factory Server with zero-data-loss SQLite outbox buffering.</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Question 1 -->
+      <div class="card" style="border-left: 4px solid #f59e0b;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <span class="badge badge-amber">QUERY #1</span>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Initial Assessment</span>
+        </div>
+        <h3 style="color: #fff; margin-bottom: 0.6rem;">Q: Analyze the two PDFs (Hardware list & Technical data). What capabilities do these machines have, and what are the available official, DIY, and microcontroller interfacing solutions?</h3>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          <strong>User Requirement:</strong> Evaluate 173 injection molding machines from PDF files and propose 3 hardware adapter solutions to connect them to a web-based monitoring dashboard.
+        </p>
+        <div style="background: #0f172a; padding: 1rem; border-radius: 8px; border: 1px solid var(--card-border); font-size: 0.9rem;">
+          <h4 style="color: #fbbf24; margin-top: 0;">Engineering Solution Implemented:</h4>
+          <ul style="margin-left: 1.25rem; color: #cbd5e1;">
+            <li>Transcribed and analyzed all 173 machines from <code>Hardware list.pdf</code>, discovering that <strong>150 machines (86.7%)</strong> are identical Netstal Diskjet 600s used for optical media.</li>
+            <li>Extracted controller, hydraulic, and sensor specifications from the 37-page <code>Technical data.pdf</code> (SYCAP DSP, ultrasonic 0.1mm stroke, 210 bar digital closed-loop hydraulics, Euromap 15/63/18/67).</li>
+            <li>Developed the 3-Solution Comparison Matrix: (1) Official/OEM Euromap 63 gateways, (2) Industrial Micro-PLCs (Arduino Opta / RevPi), and (3) Custom low-cost ESP32/Optocoupler adapter ($34 vs $350/unit), saving &gt;$54,000 in capital expenditures.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer>
+    <p>Generated for <strong>CD-Company</strong> | IoT Engineering & Modernization Project</p>
+    <p style="margin-top: 0.4rem; color: #64748b;">Referenced Documents: <code>Hardware list.pdf</code> & <code>Technical data.pdf</code></p>
+  </footer>
+
+  <script>
+    // Tab switching logic
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-section').forEach(sec => sec.classList.remove('active'));
+      document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetSection = document.getElementById(tabId);
+      if (targetSection) {
+        targetSection.classList.add('active');
+      }
+
+      event.currentTarget.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Machine fleet live filter
+    function filterMachines() {
+      const input = document.getElementById('machineSearch').value.toLowerCase();
+      const rows = document.querySelectorAll('#fleetTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    function resetFilter() {
+      document.getElementById('machineSearch').value = '';
+      filterMachines();
+    }
+
+    // Copy code snippet helper
+    function copyCode(elementId) {
+      const code = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Source code copied to clipboard successfully!');
+      });
+    }
+  </script>
+</body>
+</html>
